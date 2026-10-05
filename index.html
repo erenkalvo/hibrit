@@ -127,7 +127,7 @@ const BL={
 };
 const PLAN=[null,
  ['adapt1','10 dk koşu / 1 dk yürüyüş x3',null,null],
- ['tr','Mümkünse kolay 25 dk, değilse yok','ip','ip',{trip:'5-10 Ekim seyahati'}],
+ ['adapt1','10 dk koşu / 1 dk yürüyüş x3',null,null,{label:'Adaptasyon 1 (tekrar)'}],
  ['adapt2','12 dk koşu / 1 dk yürüyüş x3','4x3 dk','4x3 dk'],
  ['vol1','15 dk koşu / 1 dk yürüyüş x2, sonra 5 dk koşu','4x4 dk','4x4 dk'],
  ['vol1','Devamlı 20 dk, 1 dk yürüyüş, 10 dk koşu','4x4 dk','4x4 dk'],
@@ -150,12 +150,12 @@ const PLAN=[null,
  ['peak','Devamlı 50 dk','5x4 dk, son blok en sert','4x1 km tempo, arada 90 sn'],
  ['peak','Devamlı 55 dk','5x4 dk, son blok en sert','5x1 km tempo, arada 90 sn'],
  ['peak','Devamlı 55 dk, son 10 dk tempo','5x4 dk, son blok en sert','5x1 km tempo, arada 90 sn'],
- ['peak','Devamlı 60 dk','5x4 dk, son blok en sert','4x1 km biraz daha hızlı, arada 2 dk'],
- ['dl','Kolay 30 dk, ayrı günde 5K zaman testi','3x3 dk hafif','3x3 dk hafif',{test:'Şınav, barfiks, 5K zaman, VO2 max'}],
- ['fin','Devamlı 60 dk','4x4 dk (koruma)','3x2 km tempo, arada 2 dk'],
+ ['tr','Kolay 30 dk (evde veya yolda)','3x3 dk hafif (15-17 Mar)','3x3 dk hafif (15-17 Mar)',{trip:'18-21 Mart seyahati',home:'15-17 Mart evdesin: 2 gym seansı deload setleriyle, 18 Mart itibarıyla Yol. Şınav testini otelde yap.',test:'Otelde max şınav testi'}],
+ ['peak','Devamlı 60 dk','Bu hafta VO2 yerine 5K zaman testi','Bu hafta VO2 yerine 5K zaman testi',{test:'Pazartesi-Salı barfiks ve 5K zaman testi, WHOOP VO2 max. Sonra normal zirve haftası'}],
  ['fin','Devamlı 65 dk','4x4 dk (koruma)','3x2 km tempo, arada 2 dk'],
- ['fin','Devamlı 70 dk, rahat tempo','4x4 dk (koruma)','4x1 km, arada 90 sn'],
- ['fin','Kolay 40 dk (10K öncesi dinlen)','3x3 dk hafif','3x3 dk hafif'],
+ ['fin','Devamlı 70 dk, rahat tempo (en uzun koşu)','4x4 dk (koruma)','3x2 km tempo, arada 2 dk'],
+ ['tr','Kolay 40-45 dk (yolda da olur)','ip','ip',{trip:'14-18 Nisan seyahati',home:'12-13 Nisan evdesin: 1-2 gym seansı hafif setlerle, 14 Nisan itibarıyla Yol.'}],
+ ['fin','Kolay 40 dk + 4 x 1 dk hızlanma (10K öncesi dinlen)','3x3 dk hafif','3x3 dk hafif'],
  ['dl','10K deneme, durmadan','Yok, yerine test','Yok, yerine test',{test:'Final: 10K, şınav, barfiks, 5 tekrar max'}]
 ];
 const IPVO2='Yolda ip: 6 x (1 dk sert / 1 dk yürüme), opsiyonel';
@@ -163,7 +163,7 @@ function phase(w){
   const r=PLAN[w];const b=BL[r[0]];const x=r[4]||{};
   const bike=w%2===1;let vo2=bike?r[2]:r[3];if(vo2==='ip')vo2=IPVO2;
   return Object.assign({},b,{run:r[1],vo2,bike,vo2Off:!r[2],trip:x.trip,test:x.test,home:x.home,
-    name:(x.trip?'Seyahat':b.blk),tabataOk:w>=13&&bike&&/Tabata/.test(r[2]||'')});
+    name:(x.trip?'Seyahat':(x.label||b.blk)),tabataOk:w>=13&&bike&&/Tabata/.test(r[2]||'')});
 }
 const TABATA='Tabata: 20 sn tam gaz / 10 sn dinlenme x8 (4 dk). 2 kez, arada 4 dk çok hafif pedal. 20 saniyeler gerçekten tavan, 4. turdan sonra bitmiş hissetmelisin.';
 const EMOM='Opsiyonel EMOM (10 dk, interval yerine): tek dakikalar 15 KB swing 16 kg, çift dakikalar 8 burpee. Dakika dolmadan bitir, kalan süre dinlenme.';
@@ -410,7 +410,7 @@ function viewKural(){
   </ul>
   <h2>Deload ve seyahat</h2>
   <ul>
-   <li>Deload: 12, 16, 26, 31. hafta. Seyahat: 2, 7, 20-21. hafta, ikisi de hafif hafta sayılır.</li>
+   <li>Deload: 12, 16, 31. hafta. Seyahat: 7, 20-21, 25, 29. hafta, hafif hafta sayılır.</li>
    <li>Ağırlıklar aynı, hacim düşük. Testler bu haftalarda.</li>
   </ul>
   <h2>Isınma ve soğuma</h2>
@@ -450,7 +450,7 @@ function viewTest(){
    ['H7, 9-15 Kas','Max şınav (yolda)','20 şınav'],
    ['H12, 14-20 Ara','Max şınav, bantsız barfiks denemesi, 5K durmadan','22 şınav, barfiks çok yakın, 5K yürümeden'],
    ['H16, 11-17 Oca','Max şınav, barfiks, 5K zaman, WHOOP VO2 max','24 şınav, 1 barfiks, 5K 34-35 dk, VO2 45'],
-   ['H26, 22-28 Mar','Aynı set','27 şınav, 2-3 barfiks, 5K 31-32 dk, VO2 46-47'],
+   ['H25-26, 15-28 Mar','Şınav otelde (H25), barfiks ve 5K zaman 26. hafta başı','27 şınav, 2-3 barfiks, 5K 31-32 dk, VO2 46-47'],
    ['H31, 26-30 Nis','10K durmadan, şınav, barfiks, 5 tekrar max (squat, bench, RDL)','10K yürümeden, 30 şınav, 4-5 barfiks, VO2 47-48']
   ];
   return `<h1>Testler</h1>
