@@ -80,6 +80,39 @@ td,th{text-align:left;padding:7px 4px;border-top:1px solid var(--line);vertical-
 th{color:var(--mute);font-weight:600;border-top:0}
 td{color:var(--ink2)}td:first-child{color:var(--ink)}
 .hint{font-size:13px;color:var(--mute)}
+
+.big.pri{background:var(--amber);color:#1c2230;border-color:var(--amber);font-weight:700}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.opt{background:var(--surf);border:1px solid var(--line);color:var(--ink);padding:14px 10px;border-radius:12px;font-size:15px;font-family:inherit;font-weight:600;text-align:left}
+.opt small{display:block;color:var(--amber);font-weight:400;font-size:12px;margin-top:2px}
+.opt.nx{border-color:var(--amber)}
+.opt.dn{color:var(--sage)}
+.lrow{padding:14px 0;border-top:1px solid var(--line)}
+.lrow:first-child{border-top:0;padding-top:2px}
+.lrow>b{display:block;font-weight:600}
+.lrow .sub{display:block;color:var(--ink2);font-size:14px;margin:2px 0 6px}
+.lrow.tap{display:flex;gap:10px;align-items:center;cursor:pointer}
+.lrow.tap .t{flex:1}.lrow.tap .t b{display:block;font-weight:600}.lrow.tap .t span{display:block;color:var(--ink2);font-size:14px}
+.lrow.ok .t b{color:var(--sage)}
+.lrow.tap .t b .chip{display:inline-block;margin-top:0}
+.ck{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--sage);font-weight:700;flex:none}
+.mv{margin-top:10px;font-weight:600;color:var(--ink)}.mv small{color:var(--mute);font-weight:400}
+.sg{color:var(--amber);font-weight:600}
+.sets{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.set{display:flex;align-items:center;gap:4px;background:var(--surf2);border-radius:10px;padding:4px 6px}
+.set span{color:var(--mute);font-size:13px;min-width:14px;text-align:center}
+.set input{width:58px;background:var(--bg);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 6px;font-size:16px;font-family:inherit;text-align:center}
+.set.wide{flex:1 1 140px}.set.wide input{flex:1;width:auto}.set.wide span{min-width:64px;text-align:left}
+.set.date{margin:10px 0;max-width:260px}
+.note{width:100%;min-height:64px;background:var(--surf);border:1px solid var(--line);color:var(--ink);border-radius:12px;padding:10px;font-size:16px;font-family:inherit;margin:8px 0}
+.drow{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.drow:first-of-type{border-top:0}
+.drow span{color:var(--ink2);flex:none;min-width:96px}
+.drow b{flex:1;font-weight:600}.drow b small{color:var(--mute);font-weight:400}
+.drow.col{flex-direction:column;gap:2px}.drow.col span{min-width:0}
+.del{background:none;border:0;color:var(--mute);font-size:16px;padding:0 4px;font-family:inherit}
+.toast{background:rgba(143,199,163,.15);color:var(--sage);border-radius:10px;padding:10px 12px;margin:6px 0 4px;font-weight:600}
+.banner .big{margin-bottom:0}
 </style>
 </head>
 <body>
@@ -94,11 +127,11 @@ td{color:var(--ink2)}td:first-child{color:var(--ink)}
 <main id="main"></main>
 <nav class="tabs">
   <button data-t="hafta" onclick="go('hafta')"><i>▦</i>Hafta</button>
-  <button data-t="seans" onclick="go('seans')"><i>▲</i>Seanslar</button>
-  <button data-t="kural" onclick="go('kural')"><i>≡</i>Kurallar</button>
-  <button data-t="besin" onclick="go('besin')"><i>◐</i>Beslenme</button>
-  <button data-t="test" onclick="go('test')"><i>◎</i>Testler</button>
+  <button data-t="seans" onclick="go('seans')"><i>▲</i>Seans</button>
   <button data-t="yol" onclick="go('yol')"><i>✈</i>Yol</button>
+  <button data-t="gecmis" onclick="go('gecmis')"><i>↻</i>Geçmiş</button>
+  <button data-t="test" onclick="go('test')"><i>◎</i>Testler</button>
+  <button data-t="kural" onclick="go('kural')"><i>≡</i>Kurallar</button>
 </nav>
 
 <script>
@@ -234,7 +267,7 @@ const ORDER=['UA','LA','UB','LB'];
 
 /* ---------- RENDER ---------- */
 function setWeek(w){week=Math.min(NW,Math.max(1,w));done={};render();}
-function go(t){tab=t;render();}
+function go(t){tab=t;armed=null;render();}
 function repFor(row,ph){if(ph.mode==='peak'&&row.pk)return row.pk;if(ph.mode!=='vol'&&row.hv)return row.hv;return row.rep;}
 function phaseSets(row,ph){
   if(row.tip==='bb'){const st=row.cap3?Math.min(ph.bb,3):ph.bb;return {sets:st,rep:repFor(row,ph)};}
@@ -259,63 +292,19 @@ function renderHeader(){
   document.getElementById('segs').innerHTML=Array.from({length:NW},(_,i)=>{
     const w=i+1,p=phase(w);let c=w<week?'on':'';if(p.deload)c+=' dl';if(p.travel)c+=' tr';if(w===week)c+=' cur';return `<i class="${c}"></i>`;}).join('');
 }
-function render(){
+function render(keep){
+  const y=window.scrollY||0;
   renderHeader();
   document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
   const m=document.getElementById('main');
   if(tab==='hafta') m.innerHTML=viewHafta();
   else if(tab==='seans') m.innerHTML=viewSeans();
-  else if(tab==='kural') m.innerHTML=viewKural();
-  else if(tab==='besin') m.innerHTML=viewBesin();
+  else if(tab==='kural') m.innerHTML=viewKural()+viewBesin();
+  else if(tab==='gecmis') m.innerHTML=viewGecmis();
   else if(tab==='test') m.innerHTML=viewTest();
   else m.innerHTML=viewYol();
-  window.scrollTo(0,0);
-}
-
-function viewHafta(){
-  const ph=phase(week);
-  const names=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-  let top='';
-  if(ph.trip){
-    top=`<div class="banner"><b>${ph.trip}</b><p class="ink">${ph.home||'Bu hafta Yol planı: tam seans (~40 dk) veya hızlı C1/C2 (~22 dk). Haftada en az 2 seans, sıra ana plandaki gibi döner.'}</p><button class="big" onclick="go('yol')">Yol planını aç</button></div>`;
-  }
-  const c=COMBOS[combo];let ptr=gymPtr;
-  const cells=c.days.map((d,i)=>{
-    let cls='o',txt='Dinlen';
-    if(d==='G'){cls='g';const k=ORDER[ptr%4];txt=S[k].name;ptr++;}
-    if(d==='V'){cls='v';txt=ph.vo2Off?'Kolay koşu':'VO2';}
-    if(d==='R'){cls='r';txt='Koşu';}
-    return `<div class="day ${cls}"><small>${names[i]}</small><b>${txt}</b></div>`;
-  }).join('');
-  const noRun=!c.days.includes('R');
-  const nextGym=S[ORDER[gymPtr%4]].name;
-  const condOk=!ph.light&&!ph.travel&&week>=3;
-  return `
-  <h1>Bu hafta</h1>
-  <p>${ph.name}${ph.trip?'':'. '+ph.note}</p>
-  ${top}
-  ${ph.test?`<div class="card tint"><b>Test haftası</b><p>${ph.test}. Detay Testler sekmesinde.</p></div>`:''}
-  ${ph.trip&&!ph.home?'':`<h2>Kombinasyon</h2>
-  <div class="sel">${Object.keys(COMBOS).map(k=>`<button class="${k===combo?'on':''}" onclick="combo='${k}';ls('combo',combo);render()">${COMBOS[k].lab}</button>`).join('')}</div>
-  <div class="grid">${cells}</div>
-  ${noRun?'<p class="hint" style="color:var(--rose)">Bu kombinasyonda koşu yok. 10K hedefi için haftada en az 1 koşu kuralı var, bunu seyrek kullan.</p>':''}
-  <p class="hint">Günler örnek diziliş. Lower gününün ertesine VO2 veya koşu koyma. Aynı gün sabah koşu akşam gym olabilir.</p>`}
-  <div class="card">
-    <div class="head"><b>Sıradaki gym seansı: ${nextGym}</b></div>
-    <p>Sıra hep Upper A, Lower A, Upper B, Lower B. 3 gym yaptığın haftada kalan seans sonraki haftaya sarkar.</p>
-    <button class="big" onclick="session=ORDER[gymPtr%4];tab='seans';render()">Bu seansı aç</button>
-    <button class="big" onclick="gymPtr++;ls('gymPtr',gymPtr);render()">Seansı yaptım, sıradakine geç</button>
-  </div>
-  <div class="card tint">
-    <b>Bu haftanın kardiyosu</b>
-    <p><b style="color:var(--rose)">VO2</b> ${ph.vo2Off?'':ph.bike?'(bike haftası)':'(koşu haftası)'}: ${ph.vo2Off?'Bu hafta yok, yerine kolay koşu veya dinlenme':ph.vo2}</p>
-    <p><b style="color:var(--sage)">Koşu</b>: ${ph.run}</p>
-    ${combo==='3G2R'?'<p class="hint">İkinci koşu: kolay 25-35 dk, sonunda 4 x 20 sn hızlanma.</p>':''}
-  </div>
-  ${condOk?`<details><summary>Opsiyonel kondisyon günü (20 dk)</summary>
-    <p>Haftada en fazla 1, sadece WHOOP recovery yeşilse, Lower gününün ertesine değil. Isınma 5 dk, soğuma 3 dk.</p>
-    <ul><li><b>EMOM 12 dk</b>: tek dakikalar 15 KB swing 16 kg, çift dakikalar 8 burpee.</li>
-    <li><b>veya AMRAP 12 dk</b>: 10 goblet squat 16 kg, 8 şınav, 12 KB swing, 10 bicycle crunch/yan. Turları say, bir sonrakinde geç.</li></ul></details>`:''}`;
+  msg='';
+  if(keep) window.scrollTo(0,y); else window.scrollTo(0,0);
 }
 
 function exerciseRows(k){
@@ -325,46 +314,15 @@ function exerciseRows(k){
     const ps=phaseSets(r,ph);const mn=rowMin(r,ph);total+=mn;
     const id=k+i;const isDone=done[id];
     let main='',sub='';
-    if(r.tip==='bb'){main=`${r.ex}`;sub=`${ps.sets} x ${ps.rep}, ${r.rest} ara, ${ph.rir}`;}
-    else if(r.tip==='t'){main=`${r.ex}<span class="chip">T</span>`;sub=`${ps.sets} x ${ps.rep} ${ph.tFail?'tükenmeye':'2 tekrar cepte'}, ${r.rest}`;}
+    if(r.tip==='bb'){main=`${r.ex}`;sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`;}
+    else if(r.tip==='t'){main=`${r.ex}<span class="chip">T</span>`;sub=`${ps.sets} set x ${ps.rep} ${ph.tFail?'tükenmeye':'2 tekrar cepte'}, ${r.rest}`;}
     else if(r.tip==='circ'){main=`${r.ex}<span class="chip g">devre</span>`;sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
     else if(r.tip==='ss'){main=`${r.ex}${r.t?'<span class="chip">T</span>':''}`;sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
     else if(r.tip==='int'){main=`${r.ex}<span class="chip b">interval</span>`;sub=ph.light?r.det.replace(/x\d+/,m=>'x'+Math.ceil(parseInt(m.slice(1))/2)):r.det;}
     else{main=r.ex;sub=`${r.rep}, ${r.rest}`+(r.note?'. '+r.note:'');}
-    return `<div class="row ${isDone?'done':''}" onclick="done['${id}']=!done['${id}'];render()"><div class="n">${i+1}</div><div class="t"><b>${main}</b><span>${sub}</span></div><div class="m">~${mn%1?mn.toFixed(1):mn} dk</div></div>`;
+    return `<div class="row ${isDone?'done':''}" onclick="done['${id}']=!done['${id}'];render(true)"><div class="n">${i+1}</div><div class="t"><b>${main}</b><span>${sub}</span></div><div class="m">~${mn%1?mn.toFixed(1):mn} dk</div></div>`;
   }).join('');
   return {rows,total};
-}
-
-function viewSeans(){
-  const ph=phase(week);
-  const tabs=`<div class="sel">${ORDER.map(k=>`<button class="${k===session?'on':''}" onclick="session='${k}';render()">${S[k].name}</button>`).join('')}<button class="${session==='VO2'?'on':''}" onclick="session='VO2';render()">VO2</button><button class="${session==='RUN'?'on':''}" onclick="session='RUN';render()">Koşu</button></div>`;
-  if(session==='VO2'){
-    return `<h1>VO2 seansı</h1>${tabs}
-    <div class="card"><b>Hafta ${week}: ${ph.vo2Off?'yok':ph.bike?'spin bike':'koşu'}</b>
-    ${ph.vo2Off?'<p class="ink">Adaptasyon haftası, VO2 yok. Yerine kolay koşu veya dinlenme.</p>':`
-    <p class="ink">Isınma 7 dk hafif, son dakikada 2 kısa hızlanma.</p>
-    <p class="ink">Ana bölüm: ${ph.vo2}.</p>
-    ${ph.tabataOk?`<p class="ink">${TABATA}</p>`:''}
-    <p class="ink">Soğuma 7 dk.</p>
-    <p>Sert blok: ilk 60 sn kendini frenle, sona doğru sadece kelime çıkarabil. Aralar çok hafif, nabız 120-130'a insin. Son blok ilk blokla aynı hızda olmalı; öyleyse sonraki hafta bir tık hızlan.</p>
-    <p class="hint">Nabız 155-162 ile başla, birkaç seans sonra 165-170 görmek normal. Tek haftalar bike, çift haftalar koşu.</p>`}</div>`;
-  }
-  if(session==='RUN'){
-    return `<h1>Koşu seansı</h1>${tabs}
-    <div class="card"><b>Hafta ${week}</b>
-    <p class="ink">5 dk yürüyüş, sonra: ${ph.run}. Bitirince 5 dk yürüyüş.</p>
-    <p class="ink">Kolay koşularda nabız tavanı 150. İlk kilometreyi bilerek yavaş aç.</p>
-    <p class="hint">Hat: 10/1 → devamlı 25 dk (Kasım) → 5K durmadan (Aralık) → 50 dk (Şubat) → 60-70 dk (Nisan) → 10K (30 Nisan). Nefes rahat değilse süreyi artırma, bir hafta aynı kal.</p></div>`;
-  }
-  const {rows,total}=exerciseRows(session);
-  const lower=session[0]==='L';
-  return `<h1>${S[session].name}</h1><p>${S[session].sub}</p>${tabs}
-  <details><summary>Isınma, 7 dk</summary><ul class="warm">${WARM.concat(lower?WARM_LOWER:[]).map(x=>`<li>${x}</li>`).join('')}</ul></details>
-  <div class="card">${rows}<div class="sum"><span>Net iş</span><b>~${Math.round(total)} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(total)+14} dk</b></div></div>
-  <details><summary>Soğuma, 7 dk</summary><ul class="warm">${COOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>
-  ${!ph.light?`<p class="hint">${EMOM}</p>`:''}
-  <p class="hint">Satıra dokununca işaretlenir. İşaretler sayfa kapanınca sıfırlanır, ağırlıkları kendi takibinde tut.</p>`;
 }
 
 function viewKural(){
@@ -418,7 +376,7 @@ function viewKural(){
 }
 
 function viewBesin(){
-  return `<h1>Beslenme</h1>
+  return `<h1 style="margin-top:28px">Beslenme</h1>
   <p>Hedef recomp: kas kazanırken yağ kaybı. Küçük açık, yüksek protein. Aşağıdakiler 72 kg, günde 10.000 adım ve haftada 5 seans için tahmin, ölçüm değil. 3 hafta sonra kilo ve bel çevresine göre ayarlanır.</p>
   <div class="card">
    <table>
@@ -445,22 +403,304 @@ function viewBesin(){
   </ul>`;
 }
 
+/* ---------- KAYIT ---------- */
+const LKEY='hibrit_v1';
+function loadDB(){try{const s=localStorage.getItem(LKEY);if(s){const d=JSON.parse(s);d.sessions=d.sessions||[];d.tests=d.tests||{};d.active=d.active||null;return d;}}catch(e){}return {sessions:[],tests:{},active:null};}
+let DB=loadDB(), CUR=[], armed=null, msg='';
+function save(){try{localStorage.setItem(LKEY,JSON.stringify(DB));}catch(e){}}
+function iso(d){d=d||new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function weekOf(s){const d=new Date(s+'T12:00:00');return Math.min(NW,Math.max(1,Math.floor((d-START)/864e5/7)+1));}
+function wkStartIso(w){const a=new Date(START);a.setDate(a.getDate()+7*(w-1));return iso(a);}
+const GUN=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+function fmtD(s){const d=new Date(s+'T12:00:00');return d.getDate()+' '+MON[d.getMonth()];}
+function fmtDay(s){const d=new Date(s+'T12:00:00');return GUN[d.getDay()]+' '+d.getDate()+' '+MON[d.getMonth()];}
+const TYPES={UA:'Upper A',LA:'Lower A',UB:'Upper B',LB:'Lower B',VO2:'VO2',RUN:'Koşu',COND:'Kondisyon'};
+function tName(t){if(t.startsWith('Y:'))return 'Yol '+Y[t.slice(2)].name;return TYPES[t]||t;}
+function sorted(){return DB.sessions.slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.ts-b.ts);}
+function nextGymIdx(){
+  const g=sorted().filter(s=>ORDER.includes(s.type)||/^Y:B/.test(s.type));
+  if(!g.length)return gymPtr%4;
+  const l=g[g.length-1];const t=l.type.startsWith('Y:B')?l.type.slice(3):l.type;
+  return (ORDER.indexOf(t)+1)%4;
+}
+function weekSessions(w){return sorted().filter(s=>weekOf(s.date)===w);}
+function topRep(t){const n=(String(t||'').split('/')[0].match(/\d+/g)||[]).map(Number);return n.length?Math.max(...n):0;}
+function lastOf(name){const l=sorted();for(let i=l.length-1;i>=0;i--){const e=l[i].ex&&l[i].ex[name];if(e&&e.s&&e.s.length)return Object.assign({date:l[i].date},e);}return null;}
+const LOWER5=['Barbell back squat','Barbell RDL','Hip thrust barbell','Leg press'];
+function suggest(name,cur,last){
+  if(!last||!last.s.length)return '';
+  const lt=topRep(last.t),ct=topRep(cur);
+  if(lt&&ct&&ct<lt)return 'Tekrar aralığı düştü, bir kademe ağır başla';
+  if(lt&&last.s.every(x=>(x.r||0)>=lt)){
+    const inc=LOWER5.includes(name)?'+5 kg':(/Barbell|shoulder press/i.test(name)?'+2.5 kg':'bir kademe');
+    return `Son seferde tüm setler ${lt} tekrar: ${inc} dene`;
+  }
+  return 'Aynı kiloda devam, tekrarı artır';
+}
+function movesOf(r){
+  if(r.tip==='circ'||r.tip==='int')return null;
+  if(r.tip==='ss'){
+    return r.det.split(' + ').map(p=>{
+      const tm=p.match(/x\s?([\d\-]+(\/\w+)?)/);
+      const name=p.replace(/\s+x\s?[\d\-]+.*$/,'').replace(/\s+\d+\s*sn.*$/,'').trim();
+      const nm=name.charAt(0).toUpperCase()+name.slice(1);
+      let log='kgreps';
+      if(/plank/i.test(nm))log='none'; else if(/leg raise|bicycle/i.test(nm))log='reps';
+      return {name:nm,target:tm?tm[1]:'',log};
+    });
+  }
+  if(r.tip==='fx'){
+    if(/Bantlı/.test(r.ex))return [{name:r.ex,log:'band',target:'5-8'}];
+    if(/Farmer/.test(r.ex))return [{name:r.ex,log:'kg1'}];
+    return [{name:r.ex,log:'reps'}];
+  }
+  return [{name:r.ex,log:'kgreps'}];
+}
+function rowText(r,ph){
+  const ps=phaseSets(r,ph);let main=r.ex,sub='';
+  if(r.tip==='bb'){sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`;}
+  else if(r.tip==='t'){main+='<span class="chip">T</span>';sub=`${ps.sets} set x ${ps.rep} ${ph.tFail?'tükenmeye':'2 tekrar cepte'}, ${r.rest}`;}
+  else if(r.tip==='circ'){main+='<span class="chip g">devre</span>';sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
+  else if(r.tip==='ss'){main+=r.t?'<span class="chip">T</span>':'';sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
+  else if(r.tip==='int'){main+='<span class="chip b">interval</span>';sub=ph.light?r.det.replace(/x\d+/,m=>'x'+Math.ceil(parseInt(m.slice(1))/2)):r.det;}
+  else{sub=`${r.rep}, ${r.rest}`+(r.note?'. '+r.note:'');}
+  return {main,sub,ps};
+}
+
+/* seans başlat / bitir */
+function startS(t){
+  const d=(week===todayWeek())?iso():wkStartIso(week);
+  DB.active={type:t,date:d,ts:Date.now(),vals:{},checks:{},band:{},note:'',cardio:{}};
+  save();tab='seans';render();
+}
+function sv(ci,i,f,v){const a=DB.active;const nm=CUR[ci].name;a.vals[nm]=a.vals[nm]||[];a.vals[nm][i]=a.vals[nm][i]||{};a.vals[nm][i][f]=v;save();}
+function sb(ci,v){DB.active.band[CUR[ci].name]=v;save();}
+function tick(i){DB.active.checks[i]=!DB.active.checks[i];save();render(true);}
+function cset(f,v){DB.active.cardio[f]=v;save();}
+function finishS(){
+  const a=DB.active;const rec={type:a.type,date:a.date,ts:a.ts,ex:{},checks:a.checks,note:a.note,cardio:a.cardio};
+  CUR.forEach(c=>{
+    const v=(a.vals[c.name]||[]);const s=[];
+    v.forEach(x=>{if(!x)return;const kg=parseFloat(String(x.kg||'').replace(',','.'));const r=parseInt(x.r,10);
+      if(c.log==='kg1'){if(!isNaN(kg))s.push({kg});}
+      else if(!isNaN(r))s.push(isNaN(kg)?{r}:{kg,r});});
+    if(s.length||a.band[c.name])rec.ex[c.name]={t:c.target,s,band:a.band[c.name]||undefined};
+  });
+  DB.sessions.push(rec);DB.active=null;save();msg=tName(rec.type)+' kaydedildi';tab='hafta';week=weekOf(rec.date);render();
+}
+function cancelS(){if(armed==='cancel'){DB.active=null;armed=null;save();tab='hafta';}else armed='cancel';render(true);}
+function delS(ts){if(armed===ts){DB.sessions=DB.sessions.filter(s=>s.ts!==ts);armed=null;save();}else armed=ts;render(true);}
+
+function setInputs(ci,c,n,a){
+  const v=a.vals[c.name]||[];let h='';
+  if(c.log==='none')return '<p class="hint">Kayıt gerekmiyor.</p>';
+  if(c.log==='kg1'){const x=v[0]||{};return `<div class="sets"><label class="set"><span>kg</span><input inputmode="decimal" placeholder="kg" value="${x.kg??''}" oninput="sv(${ci},0,'kg',this.value)"></label></div>`;}
+  if(c.log==='band')h+=`<label class="set wide"><span>Bant</span><input placeholder="renk" value="${a.band[c.name]??''}" oninput="sb(${ci},this.value)"></label>`;
+  for(let i=0;i<n;i++){const x=v[i]||{};
+    h+=`<label class="set"><span>${i+1}</span>${c.log==='kgreps'?`<input inputmode="decimal" placeholder="kg" value="${x.kg??''}" oninput="sv(${ci},${i},'kg',this.value)">`:''}<input inputmode="numeric" placeholder="tkr" value="${x.r??''}" oninput="sv(${ci},${i},'r',this.value)"></label>`;}
+  return `<div class="sets">${h}</div>`;
+}
+function lastLine(c){
+  const l=lastOf(c.name);if(!l)return '<p class="hint">İlk kayıt.</p>';
+  const s=l.s.map(x=>(x.kg!=null?x.kg+(x.r!=null?'×':' kg'):'')+(x.r!=null?x.r:'')).join(', ');
+  const sg=c.log==='kgreps'?suggest(c.name,c.target,l):'';
+  return `<p class="hint">Son ${fmtD(l.date)}: ${l.band?l.band+' bant, ':''}${s}${sg?`<br><b class="sg">${sg}</b>`:''}</p>`;
+}
+function logGym(a){
+  const ph=phase(weekOf(a.date));CUR=[];let h='';
+  S[a.type].rows.forEach((r,ri)=>{
+    const {main,sub,ps}=rowText(r,ph);const mv=movesOf(r);
+    if(!mv){const on=a.checks[ri];h+=`<div class="lrow tap ${on?'ok':''}" onclick="tick(${ri})"><div class="t"><b>${main}</b><span>${sub}</span></div><div class="ck">${on?'✓':''}</div></div>`;return;}
+    h+=`<div class="lrow"><b>${main}</b><span class="sub">${sub}</span>`;
+    mv.forEach(m=>{
+      const ci=CUR.length;const target=m.target||ps.rep||'';const c={name:m.name,target,log:m.log};CUR.push(c);
+      const n=r.tip==='fx'?(parseInt(r.rep)||3):(ps.sets||3);
+      if(!a.vals[m.name]){const l=lastOf(m.name);a.vals[m.name]=[];if(l&&m.log==='kgreps'){for(let i=0;i<n;i++){const k=(l.s[i]||l.s[l.s.length-1]).kg;if(k!=null)a.vals[m.name][i]={kg:String(k)};}}
+        if(l&&m.log==='kg1'&&l.s[0])a.vals[m.name][0]={kg:String(l.s[0].kg)};
+        if(l&&m.log==='band'&&l.band)a.band[m.name]=l.band;}
+      if(mv.length>1)h+=`<div class="mv">${m.name}${target?` <small>x${target}</small>`:''}</div>`;
+      if(m.log!=='none')h+=lastLine(c);
+      h+=setInputs(ci,c,n,a);
+    });
+    h+='</div>';
+  });
+  save();return h;
+}
+function logYol(a){
+  const k=a.type.slice(2),y=Y[k];CUR=[];
+  if(y.vo2)return logCardio(a,'6 x (ip 1 dk sert / 1 dk yürüme), ısınma ve soğuma 4\'er dk.');
+  return y.rows.map((r,ri)=>{const on=a.checks[ri];return `<div class="lrow tap ${on?'ok':''}" onclick="tick(${ri})"><div class="t"><b>${r[0]}</b><span>${r[1]}</span></div><div class="ck">${on?'✓':''}</div></div>`;}).join('')+(y.circ?'<p class="hint">3 tur. Tur bittikçe değil, seans sonunda işaretlemen yeter.</p>':'');
+}
+function logCardio(a,presc){
+  CUR=[];const c=a.cardio;
+  return `<p class="ink">${presc}</p>
+  <div class="sets"><label class="set wide"><span>Süre</span><input inputmode="numeric" placeholder="dk" value="${c.dk??''}" oninput="cset('dk',this.value)"></label>
+  <label class="set wide"><span>Mesafe</span><input inputmode="decimal" placeholder="km" value="${c.km??''}" oninput="cset('km',this.value)"></label>
+  <label class="set wide"><span>Ort. nabız</span><input inputmode="numeric" placeholder="bpm" value="${c.hr??''}" oninput="cset('hr',this.value)"></label></div>`;
+}
+function viewLog(){
+  const a=DB.active;const w=weekOf(a.date);const ph=phase(w);let body;
+  if(S[a.type])body=logGym(a);
+  else if(a.type.startsWith('Y:'))body=logYol(a);
+  else if(a.type==='VO2')body=logCardio(a,ph.vo2Off?'Bu hafta VO2 yok, kolay koşu olarak kaydedilir.':`${ph.bike?'Spin bike':'Koşu'}: ${ph.vo2}`);
+  else if(a.type==='RUN')body=logCardio(a,'5 dk yürüyüş, '+ph.run+', 5 dk yürüyüş.');
+  else body=logCardio(a,'EMOM 12 dk (tek dk 15 KB swing, çift dk 8 burpee) veya AMRAP 12 dk. Notta hangisi ve kaç tur yazsın.');
+  const lower=a.type[0]==='L';
+  return `<h1>${tName(a.type)}</h1>
+  <p>Hafta ${w}, ${ph.name}</p>
+  <label class="set wide date"><span>Tarih</span><input type="date" value="${a.date}" onchange="DB.active.date=this.value;save();render(true)"></label>
+  ${S[a.type]?`<details><summary>Isınma, 7 dk</summary><ul class="warm">${WARM.concat(lower?WARM_LOWER:[]).map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
+  <div class="card">${body}</div>
+  ${S[a.type]?`<details><summary>Soğuma, 7 dk</summary><ul class="warm">${COOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
+  <textarea class="note" placeholder="Not (opsiyonel)" oninput="DB.active.note=this.value;save()">${a.note||''}</textarea>
+  <p class="hint">Sadece tekrarı girilen setler kaydedilir. Kilolar son seferden otomatik gelir, değiştirebilirsin. App kapansa da yazdıkların kaybolmaz.</p>
+  <button class="big pri" onclick="finishS()">Seansı bitir ve kaydet</button>
+  <button class="big" onclick="cancelS()">${armed==='cancel'?'Emin misin? Silmek için tekrar dokun':'Vazgeç'}</button>`;
+}
+
+/* ---------- HAFTA ---------- */
+function optionsFor(ph){
+  const nx=ORDER[nextGymIdx()];
+  if(ph.travel&&!ph.home)return {nx:'Y:B'+nx,list:['Y:BUA','Y:BLA','Y:BUB','Y:BLB','Y:C1','Y:C2','Y:YV','RUN'],extra:ORDER};
+  const l=ORDER.concat(['VO2','RUN']);
+  if(!ph.light&&!ph.travel&&week>=3)l.push('COND');
+  return {nx,list:l,extra:ph.home?['Y:BUA','Y:BLA','Y:BUB','Y:BLB','Y:C1','Y:C2']:[]};
+}
+function viewHafta(){
+  const ph=phase(week);
+  const names=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  const done=weekSessions(week);
+  const c=COMBOS[combo];
+  const target=ph.travel&&!ph.home?2:c.days.filter(d=>d!=='o').length;
+  const o=optionsFor(ph);
+  const cnt=t=>done.filter(s=>s.type===t).length;
+  const btn=t=>`<button class="opt ${t===o.nx?'nx':''} ${cnt(t)?'dn':''}" onclick="startS('${t}')">${tName(t).replace('Yol ','')}${cnt(t)?' ✓':''}${t===o.nx?'<small>sıradaki</small>':''}</button>`;
+  let ptr=nextGymIdx();
+  const cells=c.days.map((d,i)=>{let cls='o',txt='Dinlen';
+    if(d==='G'){cls='g';txt=S[ORDER[ptr%4]].name;ptr++;}
+    if(d==='V'){cls='v';txt=ph.vo2Off?'Kolay koşu':'VO2';}
+    if(d==='R'){cls='r';txt='Koşu';}
+    return `<div class="day ${cls}"><small>${names[i]}</small><b>${txt}</b></div>`;}).join('');
+  const noRun=!c.days.includes('R');
+  const isNow=week===todayWeek();
+  return `
+  ${msg?`<div class="toast">${msg}</div>`:''}
+  ${DB.active?`<div class="banner"><b>Devam eden seans: ${tName(DB.active.type)}</b><button class="big" onclick="go('seans')">Seansa dön</button></div>`:''}
+  <h1>${isNow?'Bugün ne yapıyorsun?':'Hafta '+week+' kaydı'}</h1>
+  <p>${ph.name}${ph.trip?'':'. '+ph.note}</p>
+  ${ph.trip?`<div class="banner"><b>${ph.trip}</b><p class="ink">${ph.home||'Bu hafta Yol planı: tam seans (~40 dk) veya hızlı C1/C2 (~22 dk). Haftada en az 2 seans.'}</p></div>`:''}
+  ${ph.test?`<div class="card tint"><b>Test haftası</b><p>${ph.test}. Sonuçları Testler sekmesine gir.</p></div>`:''}
+  ${DB.active?'':`<div class="opts">${o.list.map(btn).join('')}</div>
+  ${o.extra.length?`<details><summary>${ph.travel&&!ph.home?'Otelde salon varsa':'Yol seansları'}</summary><div class="opts">${o.extra.map(btn).join('')}</div></details>`:''}
+  ${isNow?'':'<p class="hint">Geçmiş bir haftaya kayıt giriyorsun, tarih o haftanın Pazartesi gününe ayarlanır. Seans ekranında değiştirebilirsin.</p>'}`}
+  <div class="card">
+    <div class="head"><b>Bu hafta: ${done.length} / ${target} seans</b></div>
+    ${done.length?done.map(s=>`<div class="drow"><span>${fmtDay(s.date)}</span><b>${tName(s.type)}</b></div>`).join(''):'<p>Henüz kayıt yok.</p>'}
+  </div>
+  <div class="card tint">
+    <b>Bu haftanın kardiyosu</b>
+    <p><b style="color:var(--rose)">VO2</b> ${ph.vo2Off?'':ph.bike?'(bike haftası)':'(koşu haftası)'}: ${ph.vo2Off?'Bu hafta yok, yerine kolay koşu veya dinlenme':ph.vo2}</p>
+    <p><b style="color:var(--sage)">Koşu</b>: ${ph.run}</p>
+    ${combo==='3G2R'?'<p class="hint">İkinci koşu: kolay 25-35 dk, sonunda 4 x 20 sn hızlanma.</p>':''}
+  </div>
+  ${ph.trip&&!ph.home?'':`<details><summary>Haftalık kombinasyon</summary>
+  <div class="sel">${Object.keys(COMBOS).map(k=>`<button class="${k===combo?'on':''}" onclick="combo='${k}';ls('combo',combo);render(true)">${COMBOS[k].lab}</button>`).join('')}</div>
+  <div class="grid">${cells}</div>
+  ${noRun?'<p class="hint" style="color:var(--rose)">Bu kombinasyonda koşu yok. 10K hedefi için haftada en az 1 koşu kuralı var, bunu seyrek kullan.</p>':''}
+  <p class="hint">Örnek diziliş. Lower gününün ertesine VO2 veya koşu koyma. Aynı gün sabah koşu akşam gym olabilir.</p></details>`}
+  ${!ph.light&&!ph.travel&&week>=3?`<details><summary>Opsiyonel kondisyon günü (20 dk)</summary>
+    <p>Haftada en fazla 1, sadece WHOOP recovery yeşilse, Lower gününün ertesine değil.</p>
+    <ul><li><b>EMOM 12 dk</b>: tek dakikalar 15 KB swing 16 kg, çift dakikalar 8 burpee.</li>
+    <li><b>veya AMRAP 12 dk</b>: 10 goblet squat 16 kg, 8 şınav, 12 KB swing, 10 bicycle crunch/yan.</li></ul></details>`:''}`;
+}
+
+/* ---------- SEANS ---------- */
+function viewSeans(){
+  if(DB.active)return viewLog();
+  const ph=phase(week);
+  const tabs=`<div class="sel">${ORDER.map(k=>`<button class="${k===session?'on':''}" onclick="session='${k}';render(true)">${S[k].name}</button>`).join('')}<button class="${session==='VO2'?'on':''}" onclick="session='VO2';render(true)">VO2</button><button class="${session==='RUN'?'on':''}" onclick="session='RUN';render(true)">Koşu</button></div>`;
+  const startBtn=`<button class="big pri" onclick="startS('${session}')">Bu seansı başlat</button>`;
+  if(session==='VO2'){
+    return `<h1>VO2 seansı</h1>${tabs}
+    <div class="card"><b>Hafta ${week}: ${ph.vo2Off?'yok':ph.bike?'spin bike':'koşu'}</b>
+    ${ph.vo2Off?'<p class="ink">Adaptasyon haftası, VO2 yok. Yerine kolay koşu veya dinlenme.</p>':`
+    <p class="ink">Isınma 7 dk hafif, son dakikada 2 kısa hızlanma.</p>
+    <p class="ink">Ana bölüm: ${ph.vo2}.</p>
+    ${ph.tabataOk?`<p class="ink">${TABATA}</p>`:''}
+    <p class="ink">Soğuma 7 dk.</p>
+    <p>Sert blok: ilk 60 sn kendini frenle, sona doğru sadece kelime çıkarabil. Aralar çok hafif, nabız 120-130'a insin. Son blok ilk blokla aynı hızda olmalı; öyleyse sonraki hafta bir tık hızlan.</p>
+    <p class="hint">Nabız 155-162 ile başla, birkaç seans sonra 165-170 görmek normal. Tek haftalar bike, çift haftalar koşu.</p>`}</div>${startBtn}`;
+  }
+  if(session==='RUN'){
+    return `<h1>Koşu seansı</h1>${tabs}
+    <div class="card"><b>Hafta ${week}</b>
+    <p class="ink">5 dk yürüyüş, sonra: ${ph.run}. Bitirince 5 dk yürüyüş.</p>
+    <p class="ink">Kolay koşularda nabız tavanı 150. İlk kilometreyi bilerek yavaş aç.</p>
+    <p class="hint">Hat: 10/1 → devamlı 25 dk (Kasım) → 5K durmadan (Aralık) → 50 dk (Şubat) → 60-70 dk (Nisan) → 10K (30 Nisan). Nefes rahat değilse süreyi artırma, bir hafta aynı kal.</p></div>${startBtn}`;
+  }
+  const {rows,total}=exerciseRows(session);
+  const lower=session[0]==='L';
+  return `<h1>${S[session].name}</h1><p>${S[session].sub}</p>${tabs}
+  ${startBtn}
+  <details><summary>Isınma, 7 dk</summary><ul class="warm">${WARM.concat(lower?WARM_LOWER:[]).map(x=>`<li>${x}</li>`).join('')}</ul></details>
+  <div class="card">${rows}<div class="sum"><span>Net iş</span><b>~${Math.round(total)} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(total)+14} dk</b></div></div>
+  <details><summary>Soğuma, 7 dk</summary><ul class="warm">${COOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>
+  ${!ph.light?`<p class="hint">${EMOM}</p>`:''}
+  <p class="hint">Bu ekran seansın önizlemesi. Kilo girmek için "Bu seansı başlat".</p>`;
+}
+
+/* ---------- GEÇMİŞ ---------- */
+function viewGecmis(){
+  const l=sorted();
+  const exNames=[];ORDER.forEach(k=>S[k].rows.forEach(r=>{const m=movesOf(r);if(m)m.forEach(x=>{if(x.log!=='none'&&!exNames.includes(x.name))exNames.push(x.name);});}));
+  const exHtml=exNames.map(n=>{
+    const hist=l.filter(s=>s.ex&&s.ex[n]&&s.ex[n].s.length).slice(-5);
+    if(!hist.length)return '';
+    return `<div class="drow col"><b>${n}</b><span>${hist.map(s=>{const e=s.ex[n];const best=e.s.reduce((a,b)=>((b.kg||0)>(a.kg||0)?b:a),e.s[0]);
+      return `${fmtD(s.date)}: ${e.band?e.band+' ':''}${best.kg!=null?best.kg+(best.r!=null?'×'+best.r:' kg'):best.r}${e.s.length>1?' ('+e.s.length+' set)':''}`;}).join(' · ')}</span></div>`;
+  }).join('');
+  const weeks=[];for(let w=todayWeek();w>=1&&weeks.length<8;w--)weeks.push(w);
+  return `<h1>Geçmiş</h1>
+  ${msg?`<div class="toast">${msg}</div>`:''}
+  <h2>Haftalar</h2>
+  <div class="card">${weeks.map(w=>{const s=weekSessions(w);return `<div class="drow"><span>H${w} ${wkRange(w)}</span><b>${s.length?s.map(x=>tName(x.type).replace('Yol ','Y ')).join(', '):'-'}</b></div>`;}).join('')}</div>
+  <h2>Hareketler</h2>
+  <div class="card">${exHtml||'<p>Henüz kilo kaydı yok.</p>'}</div>
+  <h2>Seanslar</h2>
+  <div class="card">${l.length?l.slice().reverse().slice(0,40).map(s=>`<div class="drow"><span>${fmtDay(s.date)}</span><b>${tName(s.type)}${s.cardio&&(s.cardio.dk||s.cardio.km)?` <small>${s.cardio.dk?s.cardio.dk+' dk':''}${s.cardio.km?' '+s.cardio.km+' km':''}</small>`:''}</b><button class="del" onclick="delS(${s.ts})">${armed===s.ts?'Sil?':'×'}</button></div>`).join(''):'<p>Henüz kayıt yok.</p>'}</div>
+  <h2>Yedek</h2>
+  <p>Veriler sadece bu telefonda. Ayda bir yedek al: kopyala veya paylaş, Notlar'a ya da kendine mail at.</p>
+  <button class="big" onclick="bkShare()">Yedeği paylaş</button>
+  <button class="big" onclick="bkCopy()">Yedeği kopyala</button>
+  <details><summary>Yedekten geri yükle</summary>
+   <textarea id="bk" class="note" placeholder="Yedek metnini buraya yapıştır"></textarea>
+   <button class="big" onclick="bkLoad()">Yedeği yükle</button>
+   <p class="hint">Yüklenen yedek mevcut kayıtların yerine geçer.</p></details>`;
+}
+function bkCopy(){const t=JSON.stringify(DB);try{navigator.clipboard.writeText(t).then(()=>{msg='Yedek kopyalandı';render(true);},()=>{msg='Kopyalanamadı, paylaş düğmesini dene';render(true);});}catch(e){msg='Kopyalanamadı, paylaş düğmesini dene';render(true);}}
+function bkShare(){const t=JSON.stringify(DB);if(navigator.share){navigator.share({title:'Hibrit yedek '+iso(),text:t}).catch(()=>{});}else bkCopy();}
+function bkLoad(){try{const d=JSON.parse(document.getElementById('bk').value);if(!Array.isArray(d.sessions))throw 0;d.tests=d.tests||{};d.active=null;DB=d;save();msg='Yedek yüklendi: '+d.sessions.length+' seans';}catch(e){msg='Metin okunamadı, yedeğin tamamını yapıştır';}render();}
+
+/* ---------- TESTLER ---------- */
+const TESTS=[
+ ['H7','H7, 9-15 Kas','Max şınav (yolda)','20 şınav'],
+ ['H12','H12, 14-20 Ara','Max şınav, bantsız barfiks denemesi, 5K durmadan','22 şınav, barfiks çok yakın, 5K yürümeden'],
+ ['H16','H16, 11-17 Oca','Max şınav, barfiks, 5K zaman, WHOOP VO2 max','24 şınav, 1 barfiks, 5K 34-35 dk, VO2 45'],
+ ['H26','H25-26, 15-28 Mar','Şınav otelde (H25), barfiks ve 5K zaman 26. hafta başı','27 şınav, 2-3 barfiks, 5K 31-32 dk, VO2 46-47'],
+ ['H31','H31, 26-30 Nis','10K durmadan, şınav, barfiks, 5 tekrar max (squat, bench, RDL)','10K yürümeden, 30 şınav, 4-5 barfiks, VO2 47-48']
+];
+const TF=[['sinav','Şınav'],['barfiks','Barfiks'],['kosu','Koşu süresi'],['vo2','VO2 max'],['kilo','Kilo'],['bel','Bel cm']];
+function tset(k,f,v){DB.tests[k]=DB.tests[k]||{};DB.tests[k][f]=v;save();}
 function viewTest(){
-  const rows=[
-   ['H7, 9-15 Kas','Max şınav (yolda)','20 şınav'],
-   ['H12, 14-20 Ara','Max şınav, bantsız barfiks denemesi, 5K durmadan','22 şınav, barfiks çok yakın, 5K yürümeden'],
-   ['H16, 11-17 Oca','Max şınav, barfiks, 5K zaman, WHOOP VO2 max','24 şınav, 1 barfiks, 5K 34-35 dk, VO2 45'],
-   ['H25-26, 15-28 Mar','Şınav otelde (H25), barfiks ve 5K zaman 26. hafta başı','27 şınav, 2-3 barfiks, 5K 31-32 dk, VO2 46-47'],
-   ['H31, 26-30 Nis','10K durmadan, şınav, barfiks, 5 tekrar max (squat, bench, RDL)','10K yürümeden, 30 şınav, 4-5 barfiks, VO2 47-48']
-  ];
   return `<h1>Testler</h1>
   <p>Deload ve seyahat haftalarında, seanslardan ayrı bir günde. Şınav ve barfiks aynı gün, koşu testi ayrı gün. Kilo ve bel çevresini de aynı hafta ölç.</p>
-  <div class="card"><table><tr><th>Ne zaman</th><th>Test</th><th>Hedef</th></tr>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')}</table></div>
+  ${TESTS.map(t=>{const v=DB.tests[t[0]]||{};return `<div class="card"><div class="head"><b>${t[1]}</b></div><p class="ink">${t[2]}</p><p class="hint">Hedef: ${t[3]}</p>
+   <div class="sets">${TF.map(f=>`<label class="set wide"><span>${f[1]}</span><input ${f[0]==='kosu'?'':'inputmode="decimal"'} placeholder="${f[0]==='kosu'?'dk:sn':'-'}" value="${v[f[0]]??''}" oninput="tset('${t[0]}','${f[0]}',this.value)"></label>`).join('')}</div></div>`;}).join('')}
   <h2>Başlangıç noktası (Eylül 2026)</h2>
   <div class="card tint">
    <span class="pill">15-20 şınav</span><span class="pill">0 barfiks</span><span class="pill">3-4 km devamlı koşu</span><span class="pill">7:15-8:15/km</span><span class="pill">VO2 max ~43</span><span class="pill">72 kg</span>
   </div>
-  <p class="hint">Hedefler tahmini. Aralık testinden sonra gerçek sayılara göre güncellenir. Eylül sonu 1 aydan fazla ara verildi, ilk hedefler buna göre muhafazakâr.</p>`;
+  <p class="hint">Hedefler tahmini. Aralık testinden sonra gerçek sayılara göre güncellenir.</p>`;
 }
 
 /* ---------- SEYAHAT ---------- */
@@ -512,19 +752,20 @@ const Y={
 };
 function viewYol(){
   const keys=['BUA','BLA','BUB','BLB','C1','C2','YV'];
-  const tabs=`<div class="sel">${keys.map(k=>`<button class="${k===yol?'on':''}" onclick="yol='${k}';render()">${Y[k].name}</button>`).join('')}</div>`;
+  const tabs=`<div class="sel">${keys.map(k=>`<button class="${k===yol?'on':''}" onclick="yol='${k}';render(true)">${Y[k].name}</button>`).join('')}</div>`;
   const y=Y[yol];
   let body='';
   if(y.vo2){
     body=`<div class="card"><p class="ink">Isınma 4 dk (ip hafif + mobilite).</p><p class="ink">6 x (ip 1 dk sert / 1 dk yürüme). Sert bloklar konuşamayacak seviye.</p><p class="ink">Soğuma 4 dk.</p><p class="hint">Ana plandaki VO2 seansının yol karşılığı. Koşu seansı yolda da aynen yapılır.</p></div>`;
   } else if(y.circ){
-    body=`<div class="card">${y.rows.map((r,i)=>{const id='y'+yol+i;return `<div class="row ${done[id]?'done':''}" onclick="done['${id}']=!done['${id}'];render()"><div class="n">${i+1}</div><div class="t"><b>${r[0]}</b></div><div class="m">${r[1]}</div></div>`}).join('')}<div class="sum"><span>3 tur, tur arası 60 sn</span><b>~15 dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~22 dk</b></div></div><p class="hint">Zaman varsa 4. tur. Tükenme yok, form temiz, amaç kayıp önlemek. C1 ve C2 dönüşümlü.</p>`;
+    body=`<div class="card">${y.rows.map((r,i)=>{const id='y'+yol+i;return `<div class="row ${done[id]?'done':''}" onclick="done['${id}']=!done['${id}'];render(true)"><div class="n">${i+1}</div><div class="t"><b>${r[0]}</b></div><div class="m">${r[1]}</div></div>`}).join('')}<div class="sum"><span>3 tur, tur arası 60 sn</span><b>~15 dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~22 dk</b></div></div><p class="hint">Zaman varsa 4. tur. Tükenme yok, form temiz, amaç kayıp önlemek. C1 ve C2 dönüşümlü.</p>`;
   } else {
     let tot=0;
-    body=`<div class="card">${y.rows.map((r,i)=>{tot+=r[2];const id='y'+yol+i;return `<div class="row ${done[id]?'done':''}" onclick="done['${id}']=!done['${id}'];render()"><div class="n">${i+1}</div><div class="t"><b>${r[0]}</b><span>${r[1]}</span></div><div class="m">~${r[2]} dk</div></div>`}).join('')}<div class="sum"><span>Net iş</span><b>~${Math.round(tot)} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(tot)+8} dk</b></div></div>`;
+    body=`<div class="card">${y.rows.map((r,i)=>{tot+=r[2];const id='y'+yol+i;return `<div class="row ${done[id]?'done':''}" onclick="done['${id}']=!done['${id}'];render(true)"><div class="n">${i+1}</div><div class="t"><b>${r[0]}</b><span>${r[1]}</span></div><div class="m">~${r[2]} dk</div></div>`}).join('')}<div class="sum"><span>Net iş</span><b>~${Math.round(tot)} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(tot)+8} dk</b></div></div>`;
   }
-  return `<h1>Yol</h1><p>Ekipman: ip, sarı ve mavi tutmaçlı bant, sarı (20 kg) ve mavi (10 kg) pilates bandı, kapı sabitlemesi. Hafta seçici burada çalışmaz.</p>${tabs}
+  return `<h1>Yol</h1><p>Ekipman: ip, sarı ve mavi tutmaçlı bant, sarı (20 kg) ve mavi (10 kg) pilates bandı, kapı sabitlemesi. Kayıt için seansı başlat.</p>${tabs}
   <h2>${y.name}</h2><p>${y.sub}</p>
+  ${DB.active?'':`<button class="big pri" onclick="startS('Y:${yol}')">Bu seansı başlat</button>`}
   ${y.vo2?'':`<details><summary>Isınma, 4 dk</summary><ul class="warm">${YWARM.map(x=>`<li>${x}</li>`).join('')}</ul></details>`}
   ${body}
   ${y.vo2?'':`<details><summary>Soğuma, 4 dk</summary><ul class="warm">${YCOOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>`}
