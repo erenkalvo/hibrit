@@ -72,7 +72,7 @@ li{margin:5px 0;color:var(--ink2)}
 li b{color:var(--ink);font-weight:600}
 .sum{display:flex;justify-content:space-between;color:var(--ink2);font-size:14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .head{display:flex;justify-content:space-between;align-items:baseline}
-.head small{color:var(--mute)}
+.head small{color:var(--sage)}
 details{margin:8px 0}
 summary{cursor:pointer;color:var(--ink);font-weight:600;padding:8px 0}
 table{width:100%;border-collapse:collapse;font-size:14px}
@@ -86,7 +86,7 @@ td{color:var(--ink2)}td:first-child{color:var(--ink)}
 .opt{background:var(--surf);border:1px solid var(--line);color:var(--ink);padding:14px 10px;border-radius:12px;font-size:15px;font-family:inherit;font-weight:600;text-align:left}
 .opt small{display:block;color:var(--amber);font-weight:400;font-size:12px;margin-top:2px}
 .opt.nx{border-color:var(--amber)}
-.opt.dn{color:var(--sage)}
+.opt.dn{color:var(--sage);display:flex;flex-direction:column}.opt.dn small{color:var(--mute)}
 .lrow{padding:14px 0;border-top:1px solid var(--line)}
 .lrow:first-child{border-top:0;padding-top:2px}
 .lrow>b{display:block;font-weight:600}
@@ -255,15 +255,7 @@ const WARM_LOWER=['Bacak sallama x10/yan','Vücut ağırlığı goblet squat x10
 const COOL=['Kapı veya rig göğüs germe 40 sn/yan','Rig lat germe 40 sn/yan','Child\'s pose 60 sn','Kalça fleksör germe 40 sn/yan','Hamstring germe 40 sn/yan','Sırtüstü 90/90 nefes 2 dk'];
 
 /* ---------- HAFTA KOMBİNASYONLARI ---------- */
-const COMBOS={
- '3G1V1R':{lab:'3 gym + 1 VO2 + 1 koşu',days:['G','R','G','o','G','V','o']},
- '4G1R':{lab:'4 gym + 1 koşu',days:['G','G','o','G','R','G','o']},
- '4G1V':{lab:'4 gym + 1 VO2',days:['G','G','o','G','V','G','o']},
- '3G2R':{lab:'3 gym + 2 koşu',days:['G','R','G','o','G','R','o']},
- '3G2V':{lab:'3 gym + 2 VO2',days:['G','V','G','o','G','V','o']},
- '3G1V':{lab:'3 gym + 1 VO2 (yoğun hafta)',days:['G','o','G','V','o','G','o']}
-};
-const ORDER=['UA','LA','UB','LB'];
+
 
 /* ---------- RENDER ---------- */
 function setWeek(w){week=Math.min(NW,Math.max(1,w));done={};render();}
@@ -355,8 +347,8 @@ function viewKural(){
   <h2>Hafta düzeni</h2>
   <ul>
    <li>Haftada en az 1 koşu. Koşusuz kombinasyonlar seyrek.</li>
-   <li>Gym seansları hep Upper A → Lower A → Upper B → Lower B sırasıyla döner.</li>
-   <li>Lower gününün ertesine VO2 veya koşu gelmez. Aynı patern arasında en az 48 saat.</li>
+   <li>Haftanın başında planı seç: 3 gym (Upper, Lower, Full Body), 4 gym (Upper A, Lower A, Upper B, Lower B) veya 2 gym (Full A, Full B). Her seans haftada bir kez, her kas haftada en az 2 kez çalışır.</li>
+   <li>Lower ve Full Body gününün ertesine VO2 veya uzun koşu gelmez. Aynı patern arasında en az 48 saat.</li>
    <li>Aynı gün iki seans olabilir: sabah koşu, akşam gym. Sabah gym akşam VO2 olmaz.</li>
    <li>Haftada en az 3 seans, seyahatte en az 2. WHOOP recovery kırmızıysa o günün seansı hafif olur veya kayar.</li>
   </ul>
@@ -364,7 +356,7 @@ function viewKural(){
   <ul>
    <li><b>Tabata</b> (H13+, bike haftaları): VO2 seansında 5x4 yerine 2 x Tabata. Ek değil, alternatif.</li>
    <li><b>EMOM</b>: gym seansının sonundaki interval yerine 10 dk EMOM seçilebilir.</li>
-   <li><b>Kondisyon günü</b>: 20 dk EMOM veya AMRAP, haftada en fazla 1, recovery yeşilse, Lower ertesi değil. Adaptasyon, deload ve seyahat haftalarında yok.</li>
+   <li><b>Bonus kondisyon</b>: 20 dk EMOM veya AMRAP, haftada en fazla 1, recovery yeşilse, Lower ertesi değil. Deload haftasında önerilmez.</li>
   </ul>
   <h2>Deload ve seyahat</h2>
   <ul>
@@ -417,12 +409,6 @@ function fmtDay(s){const d=new Date(s+'T12:00:00');return GUN[d.getDay()]+' '+d.
 const TYPES={UA:'Upper A',LA:'Lower A',UB:'Upper B',LB:'Lower B',VO2:'VO2',RUN:'Koşu',COND:'Kondisyon'};
 function tName(t){if(t.startsWith('Y:'))return 'Yol '+Y[t.slice(2)].name;return TYPES[t]||t;}
 function sorted(){return DB.sessions.slice().sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:a.ts-b.ts);}
-function nextGymIdx(){
-  const g=sorted().filter(s=>ORDER.includes(s.type)||/^Y:B/.test(s.type));
-  if(!g.length)return gymPtr%4;
-  const l=g[g.length-1];const t=l.type.startsWith('Y:B')?l.type.slice(3):l.type;
-  return (ORDER.indexOf(t)+1)%4;
-}
 function weekSessions(w){return sorted().filter(s=>weekOf(s.date)===w);}
 function topRep(t){const n=(String(t||'').split('/')[0].match(/\d+/g)||[]).map(Number);return n.length?Math.max(...n):0;}
 function lastOf(name){const l=sorted();for(let i=l.length-1;i>=0;i--){const e=l[i].ex&&l[i].ex[name];if(e&&e.s&&e.s.length)return Object.assign({date:l[i].date},e);}return null;}
@@ -545,12 +531,12 @@ function viewLog(){
   else if(a.type==='VO2')body=logCardio(a,ph.vo2Off?'Bu hafta VO2 yok, kolay koşu olarak kaydedilir.':`${ph.bike?'Spin bike':'Koşu'}: ${ph.vo2}`);
   else if(a.type==='RUN')body=logCardio(a,'5 dk yürüyüş, '+ph.run+', 5 dk yürüyüş.');
   else body=logCardio(a,'EMOM 12 dk (tek dk 15 KB swing, çift dk 8 burpee) veya AMRAP 12 dk. Notta hangisi ve kaç tur yazsın.');
-  const lower=a.type[0]==='L';
+  const lower=LOWERISH.includes(a.type);
   return `<h1>${tName(a.type)}</h1>
   <p>Hafta ${w}, ${ph.name}</p>
   <label class="set wide date"><span>Tarih</span><input type="date" value="${a.date}" onchange="DB.active.date=this.value;save();render(true)"></label>
   ${S[a.type]?`<details><summary>Isınma, 7 dk</summary><ul class="warm">${WARM.concat(lower?WARM_LOWER:[]).map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
-  <div class="card">${body}</div>
+  <div class="card">${body}${S[a.type]?`<div class="sum"><span>Net iş</span><b>~${Math.round(gymMin(a.type,ph))} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(gymMin(a.type,ph))+14} dk</b></div>`:''}</div>
   ${S[a.type]?`<details><summary>Soğuma, 7 dk</summary><ul class="warm">${COOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
   <textarea class="note" placeholder="Not (opsiyonel)" oninput="DB.active.note=this.value;save()">${a.note||''}</textarea>
   <p class="hint">Sadece tekrarı girilen setler kaydedilir. Kilolar son seferden otomatik gelir, değiştirebilirsin. App kapansa da yazdıkların kaybolmaz.</p>
@@ -558,58 +544,139 @@ function viewLog(){
   <button class="big" onclick="cancelS()">${armed==='cancel'?'Emin misin? Silmek için tekrar dokun':'Vazgeç'}</button>`;
 }
 
-/* ---------- HAFTA ---------- */
-function optionsFor(ph){
-  const nx=ORDER[nextGymIdx()];
-  if(ph.travel&&!ph.home)return {nx:'Y:B'+nx,list:['Y:BUA','Y:BLA','Y:BUB','Y:BLB','Y:C1','Y:C2','Y:YV','RUN'],extra:ORDER};
-  const l=ORDER.concat(['VO2','RUN']);
-  if(!ph.light&&!ph.travel&&week>=3)l.push('COND');
-  return {nx,list:l,extra:ph.home?['Y:BUA','Y:BLA','Y:BUB','Y:BLB','Y:C1','Y:C2']:[]};
+/* ---------- 3 GÜNLÜK VE 2 GÜNLÜK ŞABLONLAR ---------- */
+Object.assign(S,{
+ U3:{name:'Upper',sub:'Yatay + dikey itme ve çekme (3 gym haftası)',rows:[
+  {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
+  {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + ip 40 sn',rest:'tur arası 45 sn',min:5.5},
+  {tip:'bb',ex:'Makine shoulder press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'6-8'},
+  {tip:'t',ex:'Seated cable row',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'fx',ex:'Bantlı barfiks',rep:'3 x max (hedef 5-8)',rest:'90 sn',min:5.5,note:'Progresyon: bant hafifledikçe ilerle'},
+  {tip:'ss',ex:'Süperset',det:'DB lateral raise x12 + face pull x15',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
+  {tip:'ss',ex:'Süperset',det:'Triceps pushdown x12 + hammer curl x12',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
+  {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
+ ]},
+ L3:{name:'Lower',sub:'Squat + hinge, bacağın tamamı (3 gym haftası)',rows:[
+  {tip:'bb',ex:'Barbell back squat',rep:'6-8',rest:'120 sn',min:8,hv:'5-6',pk:'4-5'},
+  {tip:'bb',ex:'Barbell RDL',rep:'8-10',rest:'120 sn',min:8,hv:'6-8',pk:'5-6'},
+  {tip:'circ',ex:'Devre 1',det:'Goblet squat 20 kg x10 + burpee x6',rest:'tur arası 45 sn',min:5.5},
+  {tip:'t',ex:'Leg press',rep:'8-12',rest:'90 sn',min:4},
+  {tip:'t',ex:'Leg curl',rep:'10-12',rest:'60 sn',min:3},
+  {tip:'t',ex:'Standing calf raise',rep:'12-15',rest:'45 sn',min:2.5},
+  {tip:'ss',ex:'Core süperset',det:'Kablo crunch x12-15 + plank 40 sn',rep:'3 tur',rest:'45 sn',min:6},
+  {tip:'int',ex:'İntervaller',det:'İp 30 sn / 30 sn dinlen x8',min:8}
+ ]},
+ F3:{name:'Full Body',sub:'Bacak ve üst vücut ikinci doz (3 gym haftası)',rows:[
+  {tip:'bb',ex:'Hip thrust barbell',rep:'10',rest:'90 sn',min:6,hv:'8',pk:'8',cap3:true},
+  {tip:'t',ex:'Chest press makinesi',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'circ',ex:'Devre 1',det:'Spin bike 30 sn sert + KB swing 16 kg x12',rest:'tur arası 45 sn',min:5},
+  {tip:'bb',ex:'DB walking lunge',rep:'10/bacak',rest:'75 sn',min:6,hv:'8/bacak',pk:'8/bacak',cap3:true},
+  {tip:'t',ex:'DB tek kol row',rep:'8-12',rest:'60 sn',min:3.5},
+  {tip:'fx',ex:'Negatif barfiks',rep:'3 x 4 (5 sn iniş)',rest:'90 sn',min:4.5,note:'Sandalyeden çık, kontrollü in'},
+  {tip:'fx',ex:'Şınav',rep:'3 x max (form bozulmadan)',rest:'75 sn',min:4.5,note:'Progresyon: 20+ olunca ayak yüksekte'},
+  {tip:'t',ex:'DB shrug',rep:'12-15',rest:'45 sn',min:2.5},
+  {tip:'t',ex:'Leg extension',rep:'10-12',rest:'60 sn',min:3},
+  {tip:'ss',ex:'Core süperset',det:'Bench leg raise x12-15 + bicycle crunch x15/yan',rep:'3 tur',rest:'45 sn',min:5.5}
+ ]},
+ FA:{name:'Full A',sub:'Squat ağırlıklı full body (2 gym haftası)',rows:[
+  {tip:'bb',ex:'Barbell back squat',rep:'6-8',rest:'120 sn',min:8,hv:'5-6',pk:'4-5'},
+  {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
+  {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + ip 40 sn',rest:'tur arası 45 sn',min:5.5},
+  {tip:'t',ex:'Seated cable row',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'bb',ex:'Barbell RDL',rep:'8-10',rest:'120 sn',min:8,hv:'6-8',pk:'5-6',cap3:true},
+  {tip:'t',ex:'DB lateral raise',rep:'12-15',rest:'45 sn',min:2.5},
+  {tip:'ss',ex:'Core süperset',det:'Kablo crunch x12-15 + plank 40 sn',rep:'3 tur',rest:'45 sn',min:6},
+  {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
+ ]},
+ FB:{name:'Full B',sub:'Tek bacak + dikey full body (2 gym haftası)',rows:[
+  {tip:'bb',ex:'Bulgarian split squat DB',rep:'8/bacak',rest:'90 sn',min:7,hv:'6/bacak',pk:'6/bacak',cap3:true},
+  {tip:'bb',ex:'Makine shoulder press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'6-8'},
+  {tip:'circ',ex:'Devre 1',det:'Goblet squat 20 kg x10 + burpee x6',rest:'tur arası 45 sn',min:5.5},
+  {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'bb',ex:'Hip thrust barbell',rep:'10',rest:'90 sn',min:6,hv:'8',pk:'8',cap3:true},
+  {tip:'fx',ex:'Şınav',rep:'3 x max (form bozulmadan)',rest:'75 sn',min:4.5,note:'Progresyon: 20+ olunca ayak yüksekte'},
+  {tip:'ss',ex:'Süperset',det:'DB curl x12 + kablo rope pushdown x12',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
+  {tip:'int',ex:'İntervaller',det:'İp 30 sn / 30 sn dinlen x8',min:8}
+ ]}
+});
+const LOWERISH=['LA','LB','L3','F3','FA','FB'];
+Object.assign(TYPES,{U3:'Upper',L3:'Lower',F3:'Full Body',FA:'Full A',FB:'Full B'});
+
+/* ---------- KOMBİNASYONLAR ---------- */
+const COMBOS={
+ '3G1V1R':{lab:'3 gym + 1 VO2 + 1 koşu',note:'Varsayılan, en dengeli hafta.',slots:['U3','L3','F3','VO2','RUN'],days:['L3','o','U3','VO2','F3','o','RUN']},
+ '3G2R':{lab:'3 gym + 2 koşu',note:'Hava iyi, koşu ağırlıklı hafta. VO2 yok.',slots:['U3','L3','F3','RUN','RUN2'],days:['U3','L3','o','RUN2','F3','o','RUN']},
+ '3G2V':{lab:'3 gym + 2 VO2',note:'Koşulamayan hafta, iki VO2 de bike olabilir. Koşu yok, seyrek kullan.',slots:['U3','L3','F3','VO2','VO2'],days:['U3','VO2','L3','o','F3','o','VO2']},
+ '4G1R':{lab:'4 gym + 1 koşu',note:'Kas öncelikli hafta. VO2 yok, kondisyon devrelerde.',slots:['UA','LA','UB','LB','RUN'],days:['UA','LA','o','UB','LB','o','RUN']},
+ '4G1V':{lab:'4 gym + 1 VO2',note:'Kas öncelikli, koşulamayan hafta. Koşu yok, seyrek kullan.',slots:['UA','LA','UB','LB','VO2'],days:['UA','LA','o','UB','VO2','LB','o']},
+ '2G1V1R':{lab:'2 gym + 1 VO2 + 1 koşu',note:'Yoğun hafta. Hedef korumak.',slots:['FA','FB','VO2','RUN'],days:['FA','o','VO2','FB','o','RUN','o']},
+ 'TRB':{lab:'Seyahat: oda, aletli',note:'Bant ve ip ile tam seanslar (~40 dk). En az 2 seans.',slots:['Y:BUA','Y:BLA','Y:BUB','Y:BLB','RUN'],travel:true,min:2},
+ 'TRC':{lab:'Seyahat: oda, kısa',note:'Hızlı C1/C2 devreleri (~22 dk), dönüşümlü. En az 2 seans.',slots:['Y:C1','Y:C2','Y:C1','RUN'],travel:true,min:2}
+};
+const ORDER=['UA','LA','UB','LB'];
+function comboFor(w){DB.combos=DB.combos||{};if(DB.combos[w]&&COMBOS[DB.combos[w]])return DB.combos[w];const p=phase(w);if(p.travel&&!p.home)return 'TRB';return ls('combo')&&COMBOS[ls('combo')]?ls('combo'):'3G1V1R';}
+function setCombo(k){DB.combos=DB.combos||{};DB.combos[week]=k;if(!COMBOS[k].travel)ls('combo',k);save();render(true);}
+function slotMeta(s,ph){
+  if(s==='RUN2')return {t:'RUN',label:'Kolay koşu'};
+  if(s==='RUN')return {t:'RUN',label:'Koşu'};
+  if(s==='VO2')return ph.vo2Off?{t:'RUN',label:'Kolay koşu (VO2 yerine)'}:{t:'VO2',label:'VO2'};
+  if(s==='Y:YV')return {t:s,label:'VO2 ip'};
+  return {t:s,label:s.startsWith('Y:')?'Oda '+Y[s.slice(2)].name.replace('Hızlı ',''):tName(s)};
 }
+function slotsStatus(w){
+  const ph=phase(w),c=COMBOS[comboFor(w)];const done=weekSessions(w).slice();const used=new Set();
+  const list=c.slots.map(s=>{const m=slotMeta(s,ph);const i=done.findIndex((d,j)=>!used.has(j)&&d.type===m.t);if(i>=0)used.add(i);return Object.assign({},m,{done:i>=0?done[i]:null});});
+  const extra=done.filter((d,j)=>!used.has(j));
+  return {list,extra,c};
+}
+function gymMin(k,ph){return S[k].rows.reduce((a,r)=>a+rowMin(r,ph),0);}
+
+/* ---------- HAFTA ---------- */
 function viewHafta(){
   const ph=phase(week);
   const names=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
-  const done=weekSessions(week);
-  const c=COMBOS[combo];
-  const target=ph.travel&&!ph.home?2:c.days.filter(d=>d!=='o').length;
-  const o=optionsFor(ph);
-  const cnt=t=>done.filter(s=>s.type===t).length;
-  const btn=t=>`<button class="opt ${t===o.nx?'nx':''} ${cnt(t)?'dn':''}" onclick="startS('${t}')">${tName(t).replace('Yol ','')}${cnt(t)?' ✓':''}${t===o.nx?'<small>sıradaki</small>':''}</button>`;
-  let ptr=nextGymIdx();
-  const cells=c.days.map((d,i)=>{let cls='o',txt='Dinlen';
-    if(d==='G'){cls='g';txt=S[ORDER[ptr%4]].name;ptr++;}
-    if(d==='V'){cls='v';txt=ph.vo2Off?'Kolay koşu':'VO2';}
-    if(d==='R'){cls='r';txt='Koşu';}
-    return `<div class="day ${cls}"><small>${names[i]}</small><b>${txt}</b></div>`;}).join('');
-  const noRun=!c.days.includes('R');
+  const ck=comboFor(week);const {list,extra,c}=slotsStatus(week);
+  const doneN=list.filter(x=>x.done).length;
+  const target=c.min||list.length;
   const isNow=week===todayWeek();
+  const slotBtn=x=>x.done
+    ?`<div class="opt dn"><span>${x.label} ✓</span><small>${fmtDay(x.done.date)}</small></div>`
+    :`<button class="opt" onclick="startS('${x.t}')">${x.label}<small>başlat</small></button>`;
+  const normal=Object.keys(COMBOS).filter(k=>!COMBOS[k].travel),trav=Object.keys(COMBOS).filter(k=>COMBOS[k].travel);
+  const cbtn=k=>`<button class="${k===ck?'on':''}" onclick="setCombo('${k}')">${COMBOS[k].lab}</button>`;
+  const grid=c.days?`<div class="grid">${c.days.map((d,i)=>{let cls='o',txt='Dinlen';
+      if(S[d]){cls='g';txt=S[d].name;} else if(d==='VO2'){cls='v';txt=ph.vo2Off?'Kolay koşu':'VO2';} else if(d==='RUN'){cls='r';txt='Koşu';} else if(d==='RUN2'){cls='r';txt='Kolay koşu';}
+      return `<div class="day ${cls}"><small>${names[i]}</small><b>${txt}</b></div>`;}).join('')}</div>
+    <p class="hint">Örnek diziliş, günleri sen seçiyorsun. Lower ve Full Body'nin ertesine VO2 veya uzun koşu koyma. Aynı gün sabah koşu akşam gym olabilir.</p>`:'';
+  const bonusOk=!c.travel;
   return `
   ${msg?`<div class="toast">${msg}</div>`:''}
   ${DB.active?`<div class="banner"><b>Devam eden seans: ${tName(DB.active.type)}</b><button class="big" onclick="go('seans')">Seansa dön</button></div>`:''}
-  <h1>${isNow?'Bugün ne yapıyorsun?':'Hafta '+week+' kaydı'}</h1>
+  <h1>${isNow?'Bu hafta':'Hafta '+week}</h1>
   <p>${ph.name}${ph.trip?'':'. '+ph.note}</p>
-  ${ph.trip?`<div class="banner"><b>${ph.trip}</b><p class="ink">${ph.home||'Bu hafta Yol planı: tam seans (~40 dk) veya hızlı C1/C2 (~22 dk). Haftada en az 2 seans.'}</p></div>`:''}
+  ${ph.trip?`<div class="banner"><b>${ph.trip}</b><p class="ink">${ph.home||'Bu hafta için seyahat seçeneklerinden birini seç.'}</p></div>`:''}
   ${ph.test?`<div class="card tint"><b>Test haftası</b><p>${ph.test}. Sonuçları Testler sekmesine gir.</p></div>`:''}
-  ${DB.active?'':`<div class="opts">${o.list.map(btn).join('')}</div>
-  ${o.extra.length?`<details><summary>${ph.travel&&!ph.home?'Otelde salon varsa':'Yol seansları'}</summary><div class="opts">${o.extra.map(btn).join('')}</div></details>`:''}
-  ${isNow?'':'<p class="hint">Geçmiş bir haftaya kayıt giriyorsun, tarih o haftanın Pazartesi gününe ayarlanır. Seans ekranında değiştirebilirsin.</p>'}`}
+  <h2>Bu haftanın planı</h2>
+  <div class="sel">${normal.map(cbtn).join('')}</div>
+  <div class="sel">${trav.map(cbtn).join('')}</div>
+  <p class="hint">${c.note}</p>
   <div class="card">
-    <div class="head"><b>Bu hafta: ${done.length} / ${target} seans</b></div>
-    ${done.length?done.map(s=>`<div class="drow"><span>${fmtDay(s.date)}</span><b>${tName(s.type)}</b></div>`).join(''):'<p>Henüz kayıt yok.</p>'}
+    <div class="head"><b>${doneN} / ${list.length} seans${c.min?`, en az ${c.min}`:''}</b><small>${doneN>=target?'hedef tamam':''}</small></div>
+    ${DB.active?'<p>Devam eden seansı bitirince yenisini başlatabilirsin.</p>':`<div class="opts">${list.map(slotBtn).join('')}</div>`}
+    ${extra.length?`<p class="hint">Plan dışı: ${extra.map(s=>tName(s.type)+' ('+fmtDay(s.date)+')').join(', ')}</p>`:''}
+    ${!DB.active?(bonusOk?`<button class="big" onclick="startS('COND')">Bonus: kondisyon (20 dk)</button>`:`<button class="big" onclick="startS('Y:YV')">Bonus: ip ile VO2 (20 dk)</button>`):''}
+    ${!isNow&&!DB.active?'<p class="hint">Geçmiş bir haftaya kayıt giriyorsun, tarih o haftanın Pazartesi gününe ayarlanır. Seans ekranında değiştirebilirsin.</p>':''}
   </div>
+  ${grid?`<details><summary>Örnek gün dizilişi</summary>${grid}</details>`:''}
   <div class="card tint">
     <b>Bu haftanın kardiyosu</b>
-    <p><b style="color:var(--rose)">VO2</b> ${ph.vo2Off?'':ph.bike?'(bike haftası)':'(koşu haftası)'}: ${ph.vo2Off?'Bu hafta yok, yerine kolay koşu veya dinlenme':ph.vo2}</p>
+    <p><b style="color:var(--rose)">VO2</b> ${ph.vo2Off||c.travel||ph.travel?'':ph.bike?'(bike haftası)':'(koşu haftası)'}: ${ph.vo2Off?'Bu hafta yok, yerine kolay koşu veya dinlenme':c.travel?IPVO2:ph.vo2}${ck==='3G2V'?'. İki VO2 arasında en az 48 saat, ikisi de bike olabilir.':''}</p>
     <p><b style="color:var(--sage)">Koşu</b>: ${ph.run}</p>
-    ${combo==='3G2R'?'<p class="hint">İkinci koşu: kolay 25-35 dk, sonunda 4 x 20 sn hızlanma.</p>':''}
+    ${ck==='3G2R'?'<p class="hint">Kolay koşu: 25-35 dk, sonunda 4 x 20 sn hızlanma.</p>':''}
   </div>
-  ${ph.trip&&!ph.home?'':`<details><summary>Haftalık kombinasyon</summary>
-  <div class="sel">${Object.keys(COMBOS).map(k=>`<button class="${k===combo?'on':''}" onclick="combo='${k}';ls('combo',combo);render(true)">${COMBOS[k].lab}</button>`).join('')}</div>
-  <div class="grid">${cells}</div>
-  ${noRun?'<p class="hint" style="color:var(--rose)">Bu kombinasyonda koşu yok. 10K hedefi için haftada en az 1 koşu kuralı var, bunu seyrek kullan.</p>':''}
-  <p class="hint">Örnek diziliş. Lower gününün ertesine VO2 veya koşu koyma. Aynı gün sabah koşu akşam gym olabilir.</p></details>`}
-  ${!ph.light&&!ph.travel&&week>=3?`<details><summary>Opsiyonel kondisyon günü (20 dk)</summary>
-    <p>Haftada en fazla 1, sadece WHOOP recovery yeşilse, Lower gününün ertesine değil.</p>
+  ${bonusOk?`<details><summary>Bonus kondisyon nedir?</summary>
+    <p>İstersen haftada en fazla 1, sadece WHOOP recovery yeşilse, Lower veya Full Body ertesine değil.</p>
     <ul><li><b>EMOM 12 dk</b>: tek dakikalar 15 KB swing 16 kg, çift dakikalar 8 burpee.</li>
     <li><b>veya AMRAP 12 dk</b>: 10 goblet squat 16 kg, 8 şınav, 12 KB swing, 10 bicycle crunch/yan.</li></ul></details>`:''}`;
 }
@@ -618,7 +685,12 @@ function viewHafta(){
 function viewSeans(){
   if(DB.active)return viewLog();
   const ph=phase(week);
-  const tabs=`<div class="sel">${ORDER.map(k=>`<button class="${k===session?'on':''}" onclick="session='${k}';render(true)">${S[k].name}</button>`).join('')}<button class="${session==='VO2'?'on':''}" onclick="session='VO2';render(true)">VO2</button><button class="${session==='RUN'?'on':''}" onclick="session='RUN';render(true)">Koşu</button></div>`;
+  const ck=comboFor(week);let gk=COMBOS[ck].slots.filter(x=>S[x]);if(!gk.length)gk=['U3','L3','F3'];
+  if(!S[session]&&session!=='VO2'&&session!=='RUN')session=gk[0];
+  if(S[session]&&!gk.includes(session))gk=gk.concat([session]);
+  const allT=['U3','L3','F3','UA','LA','UB','LB','FA','FB'].filter(k=>!gk.includes(k));
+  const tabs=`<div class="sel">${gk.map(k=>`<button class="${k===session?'on':''}" onclick="session='${k}';render(true)">${S[k].name}</button>`).join('')}<button class="${session==='VO2'?'on':''}" onclick="session='VO2';render(true)">VO2</button><button class="${session==='RUN'?'on':''}" onclick="session='RUN';render(true)">Koşu</button></div>
+  <details><summary>Diğer şablonlar</summary><div class="sel">${allT.map(k=>`<button onclick="session='${k}';render(true)">${S[k].name} <small>(${k.length===2&&k[1]==='3'?'3 gym':k[0]==='F'?'2 gym':'4 gym'})</small></button>`).join('')}</div></details>`;
   const startBtn=`<button class="big pri" onclick="startS('${session}')">Bu seansı başlat</button>`;
   if(session==='VO2'){
     return `<h1>VO2 seansı</h1>${tabs}
@@ -639,7 +711,7 @@ function viewSeans(){
     <p class="hint">Hat: 10/1 → devamlı 25 dk (Kasım) → 5K durmadan (Aralık) → 50 dk (Şubat) → 60-70 dk (Nisan) → 10K (30 Nisan). Nefes rahat değilse süreyi artırma, bir hafta aynı kal.</p></div>${startBtn}`;
   }
   const {rows,total}=exerciseRows(session);
-  const lower=session[0]==='L';
+  const lower=LOWERISH.includes(session);
   return `<h1>${S[session].name}</h1><p>${S[session].sub}</p>${tabs}
   ${startBtn}
   <details><summary>Isınma, 7 dk</summary><ul class="warm">${WARM.concat(lower?WARM_LOWER:[]).map(x=>`<li>${x}</li>`).join('')}</ul></details>
@@ -652,7 +724,7 @@ function viewSeans(){
 /* ---------- GEÇMİŞ ---------- */
 function viewGecmis(){
   const l=sorted();
-  const exNames=[];ORDER.forEach(k=>S[k].rows.forEach(r=>{const m=movesOf(r);if(m)m.forEach(x=>{if(x.log!=='none'&&!exNames.includes(x.name))exNames.push(x.name);});}));
+  const exNames=[];['L3','LA','LB','U3','UA','UB','F3','FA','FB'].forEach(k=>S[k].rows.forEach(r=>{const m=movesOf(r);if(m)m.forEach(x=>{if(x.log!=='none'&&!exNames.includes(x.name))exNames.push(x.name);});}));
   const exHtml=exNames.map(n=>{
     const hist=l.filter(s=>s.ex&&s.ex[n]&&s.ex[n].s.length).slice(-5);
     if(!hist.length)return '';
@@ -770,7 +842,7 @@ function viewYol(){
   ${body}
   ${y.vo2?'':`<details><summary>Soğuma, 4 dk</summary><ul class="warm">${YCOOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>`}
   <details><summary>Yol kuralları</summary><ul>
-   <li>Tam seanslar ana plandaki sırayla döner (Upper A, Lower A, Upper B, Lower B), döndüğünde kaldığın yerden devam.</li>
+   <li>Hafta ekranında "Seyahat: oda, aletli" veya "Seyahat: oda, kısa" seçince bu seanslar o haftanın planı olur.</li>
    <li>Hızlı seanslar C1, C2 dönüşümlü. Üç gün hızlı yapılacaksa C1, C2, C1.</li>
    <li>Yolda hangi kademede olursan ol haftada en az 2 seans.</li>
    <li>Otelde salon varsa ana plan: leg press → goblet squat, chest press → DB press, lat pulldown → DB row.</li>
