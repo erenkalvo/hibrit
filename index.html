@@ -161,11 +161,12 @@ const BL={
 const PLAN=[null,
  ['adapt1','10 dk koşu / 1 dk yürüyüş x3',null,null],
  ['adapt1','10 dk koşu / 1 dk yürüyüş x3',null,null,{label:'Adaptasyon 1 (tekrar)'}],
+ ['adapt2','Yapılmadı',null,null,{label:'Atlandı (içerik 4. haftaya kaydı)'}],
  ['adapt2','12 dk koşu / 1 dk yürüyüş x3','4x3 dk','4x3 dk'],
  ['vol1','15 dk koşu / 1 dk yürüyüş x2, sonra 5 dk koşu','4x4 dk','4x4 dk'],
  ['vol1','Devamlı 20 dk, 1 dk yürüyüş, 10 dk koşu','4x4 dk','4x4 dk'],
- ['vol1','Devamlı 25 dk','5x4 dk','5x4 dk'],
  ['tr','Kolay 20-25 dk (yolda da olur)','ip','ip',{trip:'8-15 Kasım seyahati',test:'Yolda max şınav testi'}],
+ ['vol1','Devamlı 25 dk','5x4 dk','5x4 dk'],
  ['vol2','Devamlı 30 dk','5x4 dk','5x4 dk'],
  ['vol2','Devamlı 30 dk','5x4 dk','5x4 dk'],
  ['vol2','Devamlı 35 dk','6x4 dk','6x4 dk'],
@@ -177,16 +178,15 @@ const PLAN=[null,
  ['dl','Kolay 25 dk, ayrı günde 5K zaman testi','3x3 dk hafif','3x3 dk hafif',{test:'Şınav, barfiks, 5K zaman, VO2 max'}],
  ['int2','Devamlı 45 dk','6x3 dk sert veya 2 x Tabata','4x800 m, arada 2 dk yürüyüş'],
  ['int2','Devamlı 45 dk','6x3 dk sert veya 2 x Tabata','5x800 m, arada 2 dk yürüyüş'],
- ['int2','Devamlı 50 dk','6x3 dk sert veya 2 x Tabata','6x800 m, arada 2 dk yürüyüş'],
  ['tr','Kolay 30 dk','3x3 dk hafif (8-11 Şub)','3x3 dk hafif (8-11 Şub)',{trip:'12-20 Şubat seyahati',home:'8-11 Şubat evdesin: 2 gym seansı deload setleriyle, 12 Şubat itibarıyla Yol.'}],
  ['tr','Kolay 25-30 dk (yolda)','ip','ip',{trip:'12-20 Şubat seyahati'}],
+ ['int2','Devamlı 50 dk','6x3 dk sert veya 2 x Tabata','6x800 m, arada 2 dk yürüyüş'],
  ['peak','Devamlı 50 dk','5x4 dk, son blok en sert','4x1 km tempo, arada 90 sn'],
  ['peak','Devamlı 55 dk','5x4 dk, son blok en sert','5x1 km tempo, arada 90 sn'],
- ['peak','Devamlı 55 dk, son 10 dk tempo','5x4 dk, son blok en sert','5x1 km tempo, arada 90 sn'],
  ['tr','Kolay 30 dk (evde veya yolda)','3x3 dk hafif (15-17 Mar)','3x3 dk hafif (15-17 Mar)',{trip:'18-21 Mart seyahati',home:'15-17 Mart evdesin: 2 gym seansı deload setleriyle, 18 Mart itibarıyla Yol. Şınav testini otelde yap.',test:'Otelde max şınav testi'}],
+ ['peak','Devamlı 55 dk, son 10 dk tempo','5x4 dk, son blok en sert','5x1 km tempo, arada 90 sn'],
  ['peak','Devamlı 60 dk','Bu hafta VO2 yerine 5K zaman testi','Bu hafta VO2 yerine 5K zaman testi',{test:'Pazartesi-Salı barfiks ve 5K zaman testi, WHOOP VO2 max. Sonra normal zirve haftası'}],
- ['fin','Devamlı 65 dk','4x4 dk (koruma)','3x2 km tempo, arada 2 dk'],
- ['fin','Devamlı 70 dk, rahat tempo (en uzun koşu)','4x4 dk (koruma)','3x2 km tempo, arada 2 dk'],
+ ['fin','Devamlı 65-70 dk, rahat tempo (en uzun koşu)','4x4 dk (koruma)','3x2 km tempo, arada 2 dk'],
  ['tr','Kolay 40-45 dk (yolda da olur)','ip','ip',{trip:'14-18 Nisan seyahati',home:'12-13 Nisan evdesin: 1-2 gym seansı hafif setlerle, 14 Nisan itibarıyla Yol.'}],
  ['fin','Kolay 40 dk + 4 x 1 dk hızlanma (10K öncesi dinlen)','3x3 dk hafif','3x3 dk hafif'],
  ['dl','10K deneme, durmadan','Yok, yerine test','Yok, yerine test',{test:'Final: 10K, şınav, barfiks, 5 tekrar max'}]
@@ -196,7 +196,7 @@ function phase(w){
   const r=PLAN[w];const b=BL[r[0]];const x=r[4]||{};
   const bike=w%2===1;let vo2=bike?r[2]:r[3];if(vo2==='ip')vo2=IPVO2;
   return Object.assign({},b,{run:r[1],vo2,bike,vo2Off:!r[2],trip:x.trip,test:x.test,home:x.home,
-    name:(x.trip?'Seyahat':(x.label||b.blk)),tabataOk:w>=13&&bike&&/Tabata/.test(r[2]||'')});
+    name:(x.trip?'Seyahat':(x.label||b.blk)),tabataOk:w>=14&&bike&&/Tabata/.test(r[2]||'')});
 }
 const TABATA='Tabata: 20 sn tam gaz / 10 sn dinlenme x8 (4 dk). 2 kez, arada 4 dk çok hafif pedal. 20 saniyeler gerçekten tavan, 4. turdan sonra bitmiş hissetmelisin.';
 const EMOM='Opsiyonel EMOM (10 dk, interval yerine): tek dakikalar 15 KB swing 16 kg, çift dakikalar 8 burpee. Dakika dolmadan bitir, kalan süre dinlenme.';
@@ -319,12 +319,12 @@ function exerciseRows(k){
 
 function viewKural(){
   const tb=[['Adaptasyon 1 (H1)','2 set, 3 cepte','1 set, 2 cepte','2 tur, yarım'],
-   ['Adaptasyon 2 (H3)','3 set, 2 cepte','2 set T','3 tur'],
-   ['Blok 1 Hacim (H4-6)','3 set, 8-10 / 6-8','2 set T, 8-12','3 tur'],
-   ['Blok 2 Hacim (H8-11)','4 set, aynı tekrar','2 set T','3 tur'],
-   ['Blok 3-4 Yoğunluk (H13-19)','4 set, 6-8 / 5-6','2 set T, 6-10','3 tur'],
-   ['Blok 5 Zirve (H22-25)','4 set, 5-6 / 4-5','2 set T, 6-10','3 tur'],
-   ['Blok 6 Final (H27-30)','3 set, ağır, koruma','2 set T','3 tur'],
+   ['Adaptasyon 2 (H4)','3 set, 2 cepte','2 set T','3 tur'],
+   ['Blok 1 Hacim (H5-8)','3 set, 8-10 / 6-8','2 set T, 8-12','3 tur'],
+   ['Blok 2 Hacim (H9-12)','4 set, aynı tekrar','2 set T','3 tur'],
+   ['Blok 3-4 Yoğunluk (H14-22)','4 set, 6-8 / 5-6','2 set T, 6-10','3 tur'],
+   ['Blok 5 Zirve (H23-27)','4 set, 5-6 / 4-5','2 set T, 6-10','3 tur'],
+   ['Blok 6 Final (H28-30)','3 set, ağır, koruma','2 set T','3 tur'],
    ['Deload / seyahat','2 set','1 set','2 tur, yarım']];
   return `<h1>Kurallar</h1>
   <h2>Set akışı</h2>
@@ -354,13 +354,13 @@ function viewKural(){
   </ul>
   <h2>Opsiyoneller</h2>
   <ul>
-   <li><b>Tabata</b> (H13+, bike haftaları): VO2 seansında 5x4 yerine 2 x Tabata. Ek değil, alternatif.</li>
+   <li><b>Tabata</b> (H14+, bike haftaları): VO2 seansında 5x4 yerine 2 x Tabata. Ek değil, alternatif.</li>
    <li><b>EMOM</b>: gym seansının sonundaki interval yerine 10 dk EMOM seçilebilir.</li>
    <li><b>Bonus kondisyon</b>: 20 dk EMOM veya AMRAP, haftada en fazla 1, recovery yeşilse, Lower ertesi değil. Deload haftasında önerilmez.</li>
   </ul>
   <h2>Deload ve seyahat</h2>
   <ul>
-   <li>Deload: 12, 16, 31. hafta. Seyahat: 7, 20-21, 25, 29. hafta, hafif hafta sayılır.</li>
+   <li>Deload: 13, 17, 31. hafta. Seyahat: 7, 20-21, 25, 29. hafta, hafif hafta sayılır.</li>
    <li>Ağırlıklar aynı, hacim düşük. Testler bu haftalarda.</li>
   </ul>
   <h2>Isınma ve soğuma</h2>
@@ -756,9 +756,9 @@ function bkLoad(){try{const d=JSON.parse(document.getElementById('bk').value);if
 /* ---------- TESTLER ---------- */
 const TESTS=[
  ['H7','H7, 9-15 Kas','Max şınav (yolda)','20 şınav'],
- ['H12','H12, 14-20 Ara','Max şınav, bantsız barfiks denemesi, 5K durmadan','22 şınav, barfiks çok yakın, 5K yürümeden'],
- ['H16','H16, 11-17 Oca','Max şınav, barfiks, 5K zaman, WHOOP VO2 max','24 şınav, 1 barfiks, 5K 34-35 dk, VO2 45'],
- ['H26','H25-26, 15-28 Mar','Şınav otelde (H25), barfiks ve 5K zaman 26. hafta başı','27 şınav, 2-3 barfiks, 5K 31-32 dk, VO2 46-47'],
+ ['H12','H13, 21-27 Ara','Max şınav, bantsız barfiks denemesi, 5K durmadan','22 şınav, barfiks çok yakın, 5K yürümeden'],
+ ['H16','H17, 18-24 Oca','Max şınav, barfiks, 5K zaman, WHOOP VO2 max','24 şınav, 1 barfiks, 5K 34-35 dk, VO2 45'],
+ ['H26','H25-27, 15 Mar - 4 Nis','Şınav otelde (H25), barfiks ve 5K zaman 27. hafta başı','27 şınav, 2-3 barfiks, 5K 31-32 dk, VO2 46-47'],
  ['H31','H31, 26-30 Nis','10K durmadan, şınav, barfiks, 5 tekrar max (squat, bench, RDL)','10K yürümeden, 30 şınav, 4-5 barfiks, VO2 47-48']
 ];
 const TF=[['sinav','Şınav'],['barfiks','Barfiks'],['kosu','Koşu süresi'],['vo2','VO2 max'],['kilo','Kilo'],['bel','Bel cm']];
