@@ -243,7 +243,7 @@ const S={
   {tip:'bb',ex:'Barbell RDL',rep:'8-10',rest:'120 sn',min:8,hv:'6-8',pk:'5-6'},
   {tip:'bb',ex:'Bulgarian split squat DB',rep:'8/bacak',rest:'90 sn',min:7,hv:'6/bacak',pk:'6/bacak',cap3:true},
   {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x20 + şınav x10',rest:'tur arası 45 sn',min:5.5},
-  {tip:'t',ex:'Leg extension',rep:'10-12',rest:'60 sn',min:3},
+  {tip:'t',ex:'Leg curl',rep:'10-12',rest:'60 sn',min:3},
   {tip:'bb',ex:'Hip thrust barbell',rep:'10',rest:'90 sn',min:6,hv:'8',pk:'8',cap3:true},
   {tip:'t',ex:'Seated calf raise',rep:'12-15',rest:'45 sn',min:2.5},
   {tip:'ss',ex:'Core süperset',det:'Bench leg raise x12-15 + bicycle crunch x15/yan',rep:'3 tur',rest:'45 sn',min:5.5},
@@ -303,7 +303,7 @@ function render(keep){
 function exerciseRows(k){
   const ph=phase(week);
   let total=0;
-  const rows=S[k].rows.map((r,i)=>{
+  const rows=tpl(k,week===todayWeek()?iso():wkStartIso(week)).rows.map((r,i)=>{
     const ps=phaseSets(r,ph);const mn=rowMin(r,ph);total+=mn;
     const id=k+i;const isDone=done[id];
     let main='',sub='';
@@ -495,7 +495,7 @@ function lastLine(c){
 }
 function logGym(a){
   const ph=phase(weekOf(a.date));CUR=[];let h='';
-  S[a.type].rows.forEach((r,ri)=>{
+  tpl(a.type,a.date).rows.forEach((r,ri)=>{
     const {main,sub,ps}=rowText(r,ph);const mv=movesOf(r);
     if(!mv){const on=a.checks[ri];h+=`<div class="lrow tap ${on?'ok':''}" onclick="tick(${ri})"><div class="t"><b>${main}</b><span>${sub}</span></div><div class="ck">${on?'✓':''}</div></div>`;return;}
     h+=`<div class="lrow"><b>${main}</b><span class="sub">${sub}</span>`;
@@ -537,7 +537,7 @@ function viewLog(){
   <p>Hafta ${w}, ${ph.name}</p>
   <label class="set wide date"><span>Tarih</span><input type="date" value="${a.date}" onchange="DB.active.date=this.value;save();render(true)"></label>
   ${S[a.type]?`<details><summary>Isınma, 7 dk</summary><ul class="warm">${WARM.concat(lower?WARM_LOWER:[]).map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
-  <div class="card">${body}${S[a.type]?`<div class="sum"><span>Net iş</span><b>~${Math.round(gymMin(a.type,ph))} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(gymMin(a.type,ph))+14} dk</b></div>`:''}</div>
+  <div class="card">${body}${S[a.type]?`<div class="sum"><span>Net iş</span><b>~${Math.round(gymMin(a.type,ph,a.date))} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(gymMin(a.type,ph,a.date))+14} dk</b></div>`:''}</div>
   ${S[a.type]?`<details><summary>Soğuma, 7 dk</summary><ul class="warm">${COOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
   <textarea class="note" placeholder="Not (opsiyonel)" oninput="DB.active.note=this.value;save()">${a.note||''}</textarea>
   <p class="hint">Sadece tekrarı girilen setler kaydedilir. Kilolar son seferden otomatik gelir, değiştirebilirsin. App kapansa da yazdıkların kaybolmaz.</p>
@@ -549,7 +549,7 @@ function viewLog(){
 Object.assign(S,{
  U3:{name:'Upper',sub:'Yatay + dikey itme ve çekme (3 gym haftası)',rows:[
   {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
-  {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'t',ex:'Incline DB press',rep:'8-12',rest:'75 sn',min:3.5},
   {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + ip 40 sn',rest:'tur arası 45 sn',min:5.5},
   {tip:'bb',ex:'Makine shoulder press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'6-8'},
   {tip:'t',ex:'Seated cable row',rep:'8-12',rest:'75 sn',min:3.5},
@@ -577,16 +577,16 @@ Object.assign(S,{
   {tip:'fx',ex:'Negatif barfiks',rep:'3 x 4 (5 sn iniş)',rest:'90 sn',min:4.5,note:'Sandalyeden çık, kontrollü in'},
   {tip:'fx',ex:'Şınav',rep:'3 x max (form bozulmadan)',rest:'75 sn',min:4.5,note:'Progresyon: 20+ olunca ayak yüksekte'},
   {tip:'t',ex:'DB shrug',rep:'12-15',rest:'45 sn',min:2.5},
-  {tip:'t',ex:'Leg extension',rep:'10-12',rest:'60 sn',min:3},
+  {tip:'ss',ex:'Süperset',det:'Leg extension x12 + standing calf raise x15',rep:'2 tur',rest:'60 sn',min:4,t:true},
   {tip:'ss',ex:'Core süperset',det:'Bench leg raise x12-15 + bicycle crunch x15/yan',rep:'3 tur',rest:'45 sn',min:5.5}
  ]},
  FA:{name:'Full A',sub:'Squat ağırlıklı full body (2 gym haftası)',rows:[
   {tip:'bb',ex:'Barbell back squat',rep:'6-8',rest:'120 sn',min:8,hv:'5-6',pk:'4-5'},
   {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
-  {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + ip 40 sn',rest:'tur arası 45 sn',min:5.5},
+  {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + şınav x10',rest:'tur arası 45 sn',min:5.5},
   {tip:'t',ex:'Seated cable row',rep:'8-12',rest:'75 sn',min:3.5},
   {tip:'bb',ex:'Barbell RDL',rep:'8-10',rest:'120 sn',min:8,hv:'6-8',pk:'5-6',cap3:true},
-  {tip:'t',ex:'DB lateral raise',rep:'12-15',rest:'45 sn',min:2.5},
+  {tip:'ss',ex:'Süperset',det:'DB lateral raise x12 + face pull x15',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
   {tip:'ss',ex:'Core süperset',det:'Kablo crunch x12-15 + plank 40 sn',rep:'3 tur',rest:'45 sn',min:6},
   {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
  ]},
@@ -596,11 +596,24 @@ Object.assign(S,{
   {tip:'circ',ex:'Devre 1',det:'Goblet squat 20 kg x10 + burpee x6',rest:'tur arası 45 sn',min:5.5},
   {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
   {tip:'bb',ex:'Hip thrust barbell',rep:'10',rest:'90 sn',min:6,hv:'8',pk:'8',cap3:true},
-  {tip:'fx',ex:'Şınav',rep:'3 x max (form bozulmadan)',rest:'75 sn',min:4.5,note:'Progresyon: 20+ olunca ayak yüksekte'},
+  {tip:'fx',ex:'Bantlı barfiks',rep:'3 x max (hedef 5-8)',rest:'90 sn',min:5.5,note:'Progresyon: bant hafifledikçe ilerle'},
   {tip:'ss',ex:'Süperset',det:'DB curl x12 + kablo rope pushdown x12',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
   {tip:'int',ex:'İntervaller',det:'İp 30 sn / 30 sn dinlen x8',min:8}
  ]}
 });
+const OLD_TPL={U3:{name:'Upper',sub:'Eski Upper (20 Ekim ve öncesi)',rows:[
+  {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
+  {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + ip 40 sn',rest:'tur arası 45 sn',min:5.5},
+  {tip:'bb',ex:'Makine shoulder press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'6-8'},
+  {tip:'t',ex:'Seated cable row',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'fx',ex:'Bantlı barfiks',rep:'3 x max (hedef 5-8)',rest:'90 sn',min:5.5,note:'Progresyon: bant hafifledikçe ilerle'},
+  {tip:'ss',ex:'Süperset',det:'DB lateral raise x12 + face pull x15',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
+  {tip:'ss',ex:'Süperset',det:'Triceps pushdown x12 + hammer curl x12',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
+  {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
+ ]}};
+const TPL_CHANGE='2026-10-21';
+function tpl(k,d){return (OLD_TPL[k]&&d&&d<TPL_CHANGE)?OLD_TPL[k]:S[k];}
 const LOWERISH=['LA','LB','L3','F3','FA','FB'];
 Object.assign(TYPES,{U3:'Upper',L3:'Lower',F3:'Full Body',FA:'Full A',FB:'Full B'});
 
@@ -631,7 +644,7 @@ function slotsStatus(w){
   const extra=done.filter((d,j)=>!used.has(j));
   return {list,extra,c};
 }
-function gymMin(k,ph){return S[k].rows.reduce((a,r)=>a+rowMin(r,ph),0);}
+function gymMin(k,ph,d){return tpl(k,d).rows.reduce((a,r)=>a+rowMin(r,ph),0);}
 
 /* ---------- HAFTA ---------- */
 function viewHafta(){
