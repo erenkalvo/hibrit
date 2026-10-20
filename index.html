@@ -87,6 +87,7 @@ td{color:var(--ink2)}td:first-child{color:var(--ink)}
 .opt small{display:block;color:var(--amber);font-weight:400;font-size:12px;margin-top:2px}
 .opt.nx{border-color:var(--amber)}
 .opt.dn{color:var(--sage);display:flex;flex-direction:column}.opt.dn small{color:var(--mute)}
+.dnb{display:flex;gap:6px;margin-top:8px}.dnb button{flex:1;background:var(--surf2);border:1px solid var(--line);color:var(--ink2);border-radius:8px;padding:7px 4px;font-size:12px;font-family:inherit}
 .lrow{padding:14px 0;border-top:1px solid var(--line)}
 .lrow:first-child{border-top:0;padding-top:2px}
 .lrow>b{display:block;font-weight:600}
@@ -641,7 +642,7 @@ function viewHafta(){
   const target=c.min||list.length;
   const isNow=week===todayWeek();
   const slotBtn=x=>x.done
-    ?`<div class="opt dn"><span>${x.label} ✓</span><small>${fmtDay(x.done.date)}</small></div>`
+    ?`<div class="opt dn"><span>${x.label} ✓</span><small>${fmtDay(x.done.date)}</small><span class="dnb"><button onclick="startS('${x.t}')">Tekrar yap</button><button onclick="delS(${x.done.ts})">${armed===x.done.ts?'Emin misin?':'Kaydı sil'}</button></span></div>`
     :`<button class="opt" onclick="startS('${x.t}')">${x.label}<small>başlat</small></button>`;
   const normal=Object.keys(COMBOS).filter(k=>!COMBOS[k].travel),trav=Object.keys(COMBOS).filter(k=>COMBOS[k].travel);
   const cbtn=k=>`<button class="${k===ck?'on':''}" onclick="setCombo('${k}')">${COMBOS[k].lab}</button>`;
