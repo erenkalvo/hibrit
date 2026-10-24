@@ -547,7 +547,7 @@ function viewLog(){
 
 /* ---------- 3 GÜNLÜK VE 2 GÜNLÜK ŞABLONLAR ---------- */
 Object.assign(S,{
- U3:{name:'Upper',sub:'Yatay + dikey itme ve çekme (3 gym haftası)',rows:[
+ U3:{name:'Upper 1',sub:'Yatay + dikey itme ve çekme (3 gym haftası)',rows:[
   {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
   {tip:'t',ex:'Incline DB press',rep:'8-12',rest:'75 sn',min:3.5},
   {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + ip 40 sn',rest:'tur arası 45 sn',min:5.5},
@@ -601,6 +601,18 @@ Object.assign(S,{
   {tip:'int',ex:'İntervaller',det:'İp 30 sn / 30 sn dinlen x8',min:8}
  ]}
 });
+S.U2={name:'Upper 2',sub:'Üst vücut + KB ve ip (3 gym + 2 koşu haftası)',rows:[
+  {tip:'bb',ex:'Chest press makinesi',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'6-8'},
+  {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
+  {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + ip 40 sn',rest:'tur arası 45 sn',min:5.5},
+  {tip:'fx',ex:'Şınav',rep:'3 x max (form bozulmadan)',rest:'75 sn',min:4.5,note:'Progresyon: 20+ olunca ayak yüksekte'},
+  {tip:'t',ex:'DB tek kol row',rep:'8-12',rest:'60 sn',min:3.5},
+  {tip:'fx',ex:'Negatif barfiks',rep:'3 x 4 (5 sn iniş)',rest:'90 sn',min:4.5,note:'Sandalyeden çık, kontrollü in'},
+  {tip:'ss',ex:'Süperset',det:'Kablo lateral raise x12 + DB rear delt fly x15',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
+  {tip:'ss',ex:'Süperset',det:'DB curl x12 + kablo rope pushdown x12',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
+  {tip:'t',ex:'DB shrug',rep:'12-15',rest:'45 sn',min:2.5},
+  {tip:'ss',ex:'Core süperset',det:'Bench leg raise x12-15 + bicycle crunch x15/yan',rep:'3 tur',rest:'45 sn',min:5.5}
+]};
 const OLD_TPL={U3:{name:'Upper',sub:'Eski Upper (20 Ekim ve öncesi)',rows:[
   {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
   {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
@@ -615,12 +627,12 @@ const OLD_TPL={U3:{name:'Upper',sub:'Eski Upper (20 Ekim ve öncesi)',rows:[
 const TPL_CHANGE='2026-10-21';
 function tpl(k,d){return (OLD_TPL[k]&&d&&d<TPL_CHANGE)?OLD_TPL[k]:S[k];}
 const LOWERISH=['LA','LB','L3','F3','FA','FB'];
-Object.assign(TYPES,{U3:'Upper',L3:'Lower',F3:'Full Body',FA:'Full A',FB:'Full B'});
+Object.assign(TYPES,{U2:'Upper 2',U3:'Upper 1',L3:'Lower',F3:'Full Body',FA:'Full A',FB:'Full B'});
 
 /* ---------- KOMBİNASYONLAR ---------- */
 const COMBOS={
  '3G1V1R':{lab:'3 gym + 1 VO2 + 1 koşu',note:'Varsayılan, en dengeli hafta.',slots:['U3','L3','F3','VO2','RUN'],days:['L3','o','U3','VO2','F3','o','RUN']},
- '3G2R':{lab:'3 gym + 2 koşu',note:'Hava iyi, koşu ağırlıklı hafta. VO2 yok.',slots:['U3','L3','F3','RUN','RUN2'],days:['U3','L3','o','RUN2','F3','o','RUN']},
+ '3G2R':{lab:'3 gym + 2 koşu',note:'Hava iyi, koşu ağırlıklı hafta. VO2 yok. Bacak Lower ve koşularda, üçüncü gym günü Upper 2.',slots:['U3','L3','U2','RUN','RUN2'],days:['U3','L3','o','RUN2','U2','o','RUN']},
  '3G2V':{lab:'3 gym + 2 VO2',note:'Koşulamayan hafta, iki VO2 de bike olabilir. Koşu yok, seyrek kullan.',slots:['U3','L3','F3','VO2','VO2'],days:['U3','VO2','L3','o','F3','o','VO2']},
  '4G1R':{lab:'4 gym + 1 koşu',note:'Kas öncelikli hafta. VO2 yok, kondisyon devrelerde.',slots:['UA','LA','UB','LB','RUN'],days:['UA','LA','o','UB','LB','o','RUN']},
  '4G1V':{lab:'4 gym + 1 VO2',note:'Kas öncelikli, koşulamayan hafta. Koşu yok, seyrek kullan.',slots:['UA','LA','UB','LB','VO2'],days:['UA','LA','o','UB','VO2','LB','o']},
@@ -702,9 +714,9 @@ function viewSeans(){
   const ck=comboFor(week);let gk=COMBOS[ck].slots.filter(x=>S[x]);if(!gk.length)gk=['U3','L3','F3'];
   if(!S[session]&&session!=='VO2'&&session!=='RUN')session=gk[0];
   if(S[session]&&!gk.includes(session))gk=gk.concat([session]);
-  const allT=['U3','L3','F3','UA','LA','UB','LB','FA','FB'].filter(k=>!gk.includes(k));
+  const allT=['U3','L3','F3','U2','UA','LA','UB','LB','FA','FB'].filter(k=>!gk.includes(k));
   const tabs=`<div class="sel">${gk.map(k=>`<button class="${k===session?'on':''}" onclick="session='${k}';render(true)">${S[k].name}</button>`).join('')}<button class="${session==='VO2'?'on':''}" onclick="session='VO2';render(true)">VO2</button><button class="${session==='RUN'?'on':''}" onclick="session='RUN';render(true)">Koşu</button></div>
-  <details><summary>Diğer şablonlar</summary><div class="sel">${allT.map(k=>`<button onclick="session='${k}';render(true)">${S[k].name} <small>(${k.length===2&&k[1]==='3'?'3 gym':k[0]==='F'?'2 gym':'4 gym'})</small></button>`).join('')}</div></details>`;
+  <details><summary>Diğer şablonlar</summary><div class="sel">${allT.map(k=>`<button onclick="session='${k}';render(true)">${S[k].name} <small>(${{U3:'3 gym',L3:'3 gym',F3:'3 gym',U2:'3 gym + 2 koşu'}[k]||(k[0]==='F'?'2 gym':'4 gym')})</small></button>`).join('')}</div></details>`;
   const startBtn=`<button class="big pri" onclick="startS('${session}')">Bu seansı başlat</button>`;
   if(session==='VO2'){
     return `<h1>VO2 seansı</h1>${tabs}
@@ -738,7 +750,7 @@ function viewSeans(){
 /* ---------- GEÇMİŞ ---------- */
 function viewGecmis(){
   const l=sorted();
-  const exNames=[];['L3','LA','LB','U3','UA','UB','F3','FA','FB'].forEach(k=>S[k].rows.forEach(r=>{const m=movesOf(r);if(m)m.forEach(x=>{if(x.log!=='none'&&!exNames.includes(x.name))exNames.push(x.name);});}));
+  const exNames=[];['L3','LA','LB','U3','U2','UA','UB','F3','FA','FB'].forEach(k=>S[k].rows.forEach(r=>{const m=movesOf(r);if(m)m.forEach(x=>{if(x.log!=='none'&&!exNames.includes(x.name))exNames.push(x.name);});}));
   const exHtml=exNames.map(n=>{
     const hist=l.filter(s=>s.ex&&s.ex[n]&&s.ex[n].s.length).slice(-5);
     if(!hist.length)return '';
