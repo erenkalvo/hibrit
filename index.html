@@ -473,10 +473,10 @@ function finishS(){
       else if(!isNaN(r))s.push(isNaN(kg)?{r}:{kg,r});});
     if(s.length||a.band[c.name])rec.ex[c.name]={t:c.target,s,band:a.band[c.name]||undefined};
   });
-  DB.sessions.push(rec);DB.active=null;save();msg=tName(rec.type)+' kaydedildi';tab='hafta';week=weekOf(rec.date);render();
+  DB.sessions.push(rec);pend().s.push(rec.ts);DB.active=null;save();syncLater(100);msg=tName(rec.type)+' kaydedildi';tab='hafta';week=weekOf(rec.date);render();
 }
 function cancelS(){if(armed==='cancel'){DB.active=null;armed=null;save();tab='hafta';}else armed='cancel';render(true);}
-function delS(ts){if(armed===ts){DB.sessions=DB.sessions.filter(s=>s.ts!==ts);armed=null;save();}else armed=ts;render(true);}
+function delS(ts){if(armed===ts){DB.sessions=DB.sessions.filter(s=>s.ts!==ts);const p=pend();p.s=p.s.filter(t=>t!==ts);p.d.push(ts);armed=null;save();syncLater(100);}else armed=ts;render(true);}
 
 function setInputs(ci,c,n,a){
   const v=a.vals[c.name]||[];let h='';
@@ -642,7 +642,7 @@ const COMBOS={
 };
 const ORDER=['UA','LA','UB','LB'];
 function comboFor(w){DB.combos=DB.combos||{};if(DB.combos[w]&&COMBOS[DB.combos[w]])return DB.combos[w];const p=phase(w);if(p.travel&&!p.home)return 'TRB';return ls('combo')&&COMBOS[ls('combo')]?ls('combo'):'3G1V1R';}
-function setCombo(k){DB.combos=DB.combos||{};DB.combos[week]=k;if(!COMBOS[k].travel)ls('combo',k);save();render(true);}
+function setCombo(k){DB.combos=DB.combos||{};DB.combos[week]=k;if(!COMBOS[k].travel)ls('combo',k);pend().meta=true;save();syncLater();render(true);}
 function slotMeta(s,ph){
   if(s==='RUN2')return {t:'RUN',label:'Kolay koşu'};
   if(s==='RUN')return {t:'RUN',label:'Koşu'};
@@ -657,6 +657,60 @@ function slotsStatus(w){
   return {list,extra,c};
 }
 function gymMin(k,ph,d){return tpl(k,d).rows.reduce((a,r)=>a+rowMin(r,ph),0);}
+
+
+/* ---------- SENKRON (Google Sheets) ---------- */
+const SKEY='hibrit_sync';
+let syncState='', syncTimer=null;
+function syncUrl(){return ls(SKEY)||'';}
+function pend(){DB.pending=DB.pending||{s:[],d:[],meta:false};return DB.pending;}
+function syncLater(ms){clearTimeout(syncTimer);syncTimer=setTimeout(flush,ms||1500);}
+async function api(body){
+  const u=syncUrl();if(!u)return null;
+  const r=body?await fetch(u,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'text/plain;charset=utf-8'}}):await fetch(u);
+  return r.json();
+}
+async function flush(){
+  if(!syncUrl())return;const p=pend();
+  if(!p.s.length&&!p.d.length&&!p.meta)return;
+  const ids=p.s.slice(),dels=p.d.slice();
+  const body={sessions:DB.sessions.filter(x=>ids.includes(x.ts)).map(x=>Object.assign({label:tName(x.type)},x)),del:dels,tests:DB.tests,combos:DB.combos||{}};
+  try{const r=await api(body);
+    if(r&&r.ok){p.s=p.s.filter(t=>!ids.includes(t));p.d=p.d.filter(t=>!dels.includes(t));p.meta=false;save();syncState='ok';}
+    else syncState='err';
+  }catch(e){syncState='err';}
+  if(tab==='gecmis')render(true);
+}
+async function pull(){
+  if(!syncUrl())return;
+  try{const r=await api(null);if(!r||!r.ok){syncState='err';return;}
+    const p=pend();const server=new Set(r.sessions.map(x=>x.ts));
+    DB.sessions.forEach(x=>{if(!server.has(x.ts)&&!p.d.includes(x.ts)&&!p.s.includes(x.ts))p.s.push(x.ts);});
+    const local=new Set(DB.sessions.map(x=>x.ts));
+    r.sessions.forEach(x=>{if(!local.has(x.ts)&&!p.d.includes(x.ts))DB.sessions.push(x);});
+    DB.tests=Object.assign({},r.tests||{},DB.tests||{});DB.combos=Object.assign({},r.combos||{},DB.combos||{});
+    p.meta=true;save();syncState='ok';
+    if(!DB.active||tab!=='seans')render(true);
+    flush();
+  }catch(e){syncState='err';}
+}
+function connectSync(){
+  const v=(document.getElementById('surl').value||'').trim();
+  if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec/.test(v)){msg='Bağlantı adresi tanınmadı. script.google.com/macros/s/.../exec ile biten adresi yapıştır.';render(true);return;}
+  ls(SKEY,v);msg='Bağlandı, kayıtlar aktarılıyor';syncState='';render(true);pull();
+}
+function syncCard(){
+  const u=syncUrl();const p=pend();const n=p.s.length+p.d.length;
+  return `<h2>Kayıt yedeği</h2>
+  <div class="card ${u?'':'tint'}">
+   ${u?`<b>${syncState==='err'?'Google Sheets\'e ulaşılamadı':'Google Sheets\'e bağlı'}</b>
+     <p>${n?n+' kayıt aktarılmayı bekliyor, internet gelince gönderilir.':'Tüm kayıtlar "Hibrit Kayıtlar" tablosunda.'}</p>
+     <button class="big" onclick="pull()">Şimdi eşitle</button>`
+   :`<b>Kayıtlar sadece bu telefonda</b><p>Google Sheets bağlantı adresini buraya yapıştır. Bir kez yapman yeterli, uygulamayı silsen de kayıtlar tabloda kalır.</p>
+     <input id="surl" class="note" style="min-height:0" placeholder="https://script.google.com/macros/s/.../exec">
+     <button class="big pri" onclick="connectSync()">Bağla</button>`}
+  </div>`;
+}
 
 /* ---------- HAFTA ---------- */
 function viewHafta(){
@@ -679,6 +733,7 @@ function viewHafta(){
   return `
   ${msg?`<div class="toast">${msg}</div>`:''}
   ${DB.active?`<div class="banner"><b>Devam eden seans: ${tName(DB.active.type)}</b><button class="big" onclick="go('seans')">Seansa dön</button></div>`:''}
+  ${syncUrl()?'':'<div class="banner"><b>Kayıtlar sadece bu telefonda</b><p class="ink">Geçmiş sekmesinden Google Sheets bağlantısını kur.</p><button class="big" onclick="go(\'gecmis\')">Bağlantıyı kur</button></div>'}
   <h1>${isNow?'Bu hafta':'Hafta '+week}</h1>
   <p>${ph.name}${ph.trip?'':'. '+ph.note}</p>
   ${ph.trip?`<div class="banner"><b>${ph.trip}</b><p class="ink">${ph.home||'Bu hafta için seyahat seçeneklerinden birini seç.'}</p></div>`:''}
@@ -766,7 +821,8 @@ function viewGecmis(){
   <div class="card">${exHtml||'<p>Henüz kilo kaydı yok.</p>'}</div>
   <h2>Seanslar</h2>
   <div class="card">${l.length?l.slice().reverse().slice(0,40).map(s=>`<div class="drow"><span>${fmtDay(s.date)}</span><b>${tName(s.type)}${s.cardio&&(s.cardio.dk||s.cardio.km)?` <small>${s.cardio.dk?s.cardio.dk+' dk':''}${s.cardio.km?' '+s.cardio.km+' km':''}</small>`:''}</b><button class="del" onclick="delS(${s.ts})">${armed===s.ts?'Sil?':'×'}</button></div>`).join(''):'<p>Henüz kayıt yok.</p>'}</div>
-  <h2>Yedek</h2>
+  ${syncCard()}
+  <h2>Elle yedek</h2>
   <p>Veriler sadece bu telefonda. Ayda bir yedek al: kopyala veya paylaş, Notlar'a ya da kendine mail at.</p>
   <button class="big" onclick="bkShare()">Yedeği paylaş</button>
   <button class="big" onclick="bkCopy()">Yedeği kopyala</button>
@@ -788,7 +844,7 @@ const TESTS=[
  ['H31','H31, 26-30 Nis','10K durmadan, şınav, barfiks, 5 tekrar max (squat, bench, RDL)','10K yürümeden, 30 şınav, 4-5 barfiks, VO2 47-48']
 ];
 const TF=[['sinav','Şınav'],['barfiks','Barfiks'],['kosu','Koşu süresi'],['vo2','VO2 max'],['kilo','Kilo'],['bel','Bel cm']];
-function tset(k,f,v){DB.tests[k]=DB.tests[k]||{};DB.tests[k][f]=v;save();}
+function tset(k,f,v){DB.tests[k]=DB.tests[k]||{};DB.tests[k][f]=v;pend().meta=true;save();syncLater(2000);}
 function viewTest(){
   return `<h1>Testler</h1>
   <p>Deload ve seyahat haftalarında, seanslardan ayrı bir günde. Şınav ve barfiks aynı gün, koşu testi ayrı gün. Kilo ve bel çevresini de aynı hafta ölç.</p>
@@ -878,6 +934,7 @@ function viewYol(){
 }
 
 render();
+pull();
 </script>
 </body>
 </html>
