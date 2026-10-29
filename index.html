@@ -307,7 +307,7 @@ function exerciseRows(k){
     const ps=phaseSets(r,ph);const mn=rowMin(r,ph);total+=mn;
     const id=k+i;const isDone=done[id];
     let main='',sub='';
-    if(r.tip==='bb'){main=`${r.ex}`;sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`;}
+    if(r.tip==='bb'){main=`${r.ex}`;sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`+(r.note?'. '+r.note:'');}
     else if(r.tip==='t'){main=`${r.ex}<span class="chip">T</span>`;sub=`${ps.sets} set x ${ps.rep} ${ph.tFail?'tükenmeye':'2 tekrar cepte'}, ${r.rest}`+(r.note?'. '+r.note:'');}
     else if(r.tip==='circ'){main=`${r.ex}<span class="chip g">devre</span>`;sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
     else if(r.tip==='ss'){main=`${r.ex}${r.t?'<span class="chip">T</span>':''}`;sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
@@ -454,7 +454,7 @@ function movesOf(r){
 }
 function rowText(r,ph){
   const ps=phaseSets(r,ph);let main=r.ex,sub='';
-  if(r.tip==='bb'){sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`;}
+  if(r.tip==='bb'){sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`+(r.note?'. '+r.note:'');}
   else if(r.tip==='t'){main+='<span class="chip">T</span>';sub=`${ps.sets} set x ${ps.rep} ${ph.tFail?'tükenmeye':'2 tekrar cepte'}, ${r.rest}`+(r.note?'. '+r.note:'');}
   else if(r.tip==='circ'){main+='<span class="chip g">devre</span>';sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
   else if(r.tip==='ss'){main+=r.t?'<span class="chip">T</span>':'';sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
@@ -567,15 +567,15 @@ Object.assign(S,{
   {tip:'ss',ex:'Süperset',det:'Triceps pushdown x12 + hammer curl x12',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
   {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
  ]},
- L3:{name:'Lower A',sub:'Squat + hinge, diz ve baldır güçlendirme',rows:[
-  {tip:'bb',ex:'Barbell back squat',rep:'6-8',rest:'120 sn',min:8,hv:'5-6',pk:'4-5'},
-  {tip:'bb',ex:'Barbell RDL',rep:'8-10',rest:'120 sn',min:8,hv:'6-8',pk:'5-6'},
+ L3:{name:'Lower A',sub:'Haftanın tek bacak günü: çift bacak, tek bacak, kalça, diz, baldır',rows:[
+  {tip:'bb',ex:'DB goblet squat',rep:'8-10',rest:'90 sn',min:7,hv:'6-8',pk:'6-8',note:'Gövde dik, ağrısız derinlik'},
+  {tip:'bb',ex:'DB RDL',rep:'8-10',rest:'90 sn',min:7,hv:'6-8',pk:'6-8'},
   {tip:'circ',ex:'Diz devresi',det:'Step-down x8/bacak (3 sn iniş) + Spanish squat 45 sn',rest:'tur arası 45 sn',min:6},
-  {tip:'t',ex:'Leg press',rep:'8-12',rest:'90 sn',min:4},
+  {tip:'bb',ex:'DB reverse lunge',rep:'10/bacak',rest:'75 sn',min:6,hv:'8/bacak',pk:'8/bacak',cap3:true,note:'Adım biraz uzun, kalçayı hisset'},
+  {tip:'bb',ex:'DB hip thrust',rep:'10',rest:'75 sn',min:5.5,hv:'8',pk:'8',cap3:true,note:'Sırt bench\'te, dumbbell kalçada (araya havlu). Rahatsız ederse tek bacak glute bridge'},
   {tip:'t',ex:'Leg curl',rep:'10-12',rest:'60 sn',min:3},
   {tip:'ss',ex:'Baldır süperset',det:'Standing calf raise x12-15 + seated calf raise x15',rep:'2 tur',rest:'45 sn',min:4.5,t:true},
-  {tip:'ss',ex:'Core süperset',det:'Kablo crunch x12-15 + plank 40 sn',rep:'3 tur',rest:'45 sn',min:6},
-  {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
+  {tip:'ss',ex:'Core süperset',det:'Kablo crunch x12-15 + plank 40 sn',rep:'3 tur',rest:'45 sn',min:5}
  ]},
  F3:{name:'Full Body',sub:'Bacak ve üst vücut ikinci doz (3 gym haftası)',rows:[
   {tip:'bb',ex:'Hip thrust barbell',rep:'10',rest:'90 sn',min:6,hv:'8',pk:'8',cap3:true},
@@ -589,12 +589,12 @@ Object.assign(S,{
   {tip:'ss',ex:'Süperset',det:'Leg extension x12 + standing calf raise x15',rep:'2 tur',rest:'60 sn',min:4,t:true},
   {tip:'ss',ex:'Core süperset',det:'Bench leg raise x12-15 + bicycle crunch x15/yan',rep:'3 tur',rest:'45 sn',min:5.5}
  ]},
- FA:{name:'Full A',sub:'Squat ağırlıklı full body (2 gym haftası)',rows:[
-  {tip:'bb',ex:'Barbell back squat',rep:'6-8',rest:'120 sn',min:8,hv:'5-6',pk:'4-5'},
+ FA:{name:'Full A',sub:'Goblet squat ağırlıklı full body (2 gym haftası)',rows:[
+  {tip:'bb',ex:'DB goblet squat',rep:'8-10',rest:'90 sn',min:7,hv:'6-8',pk:'6-8',note:'Gövde dik, ağrısız derinlik'},
   {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
   {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + şınav x10',rest:'tur arası 45 sn',min:5.5},
   {tip:'t',ex:'Seated cable row',rep:'8-12',rest:'75 sn',min:3.5},
-  {tip:'bb',ex:'Barbell RDL',rep:'8-10',rest:'120 sn',min:8,hv:'6-8',pk:'5-6',cap3:true},
+  {tip:'bb',ex:'DB RDL',rep:'8-10',rest:'90 sn',min:7,hv:'6-8',pk:'6-8',cap3:true},
   {tip:'ss',ex:'Süperset',det:'DB lateral raise x12 + face pull x15',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
   {tip:'ss',ex:'Core süperset',det:'Kablo crunch x12-15 + plank 40 sn',rep:'3 tur',rest:'45 sn',min:6},
   {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
@@ -604,7 +604,7 @@ Object.assign(S,{
   {tip:'bb',ex:'Makine shoulder press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'6-8'},
   {tip:'circ',ex:'Devre 1',det:'Goblet squat 20 kg x10 + step-down x8/bacak (3 sn iniş)',rest:'tur arası 45 sn',min:5.5},
   {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
-  {tip:'bb',ex:'Hip thrust barbell',rep:'10',rest:'90 sn',min:6,hv:'8',pk:'8',cap3:true},
+  {tip:'bb',ex:'DB hip thrust',rep:'10',rest:'75 sn',min:5.5,hv:'8',pk:'8',cap3:true,note:'Sırt bench\'te, dumbbell kalçada (araya havlu). Rahatsız ederse tek bacak glute bridge'},
   {tip:'fx',ex:'Bantlı barfiks',rep:'3 x max (hedef 5-8)',rest:'90 sn',min:5.5,note:'Progresyon: bant hafifledikçe ilerle'},
   {tip:'ss',ex:'Süperset',det:'DB curl x12 + kablo rope pushdown x12',rep:'2 tur',rest:'60 sn',min:4.5,t:true},
   {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
@@ -622,11 +622,10 @@ S.U2={name:'Upper B',sub:'Üst vücut + KB ve ip (3 gym + 2 koşu haftası)',row
   {tip:'t',ex:'DB shrug',rep:'12-15',rest:'45 sn',min:2.5},
   {tip:'ss',ex:'Core süperset',det:'Bench leg raise x12-15 + bicycle crunch x15/yan',rep:'3 tur',rest:'45 sn',min:5.5}
 ]};
-S.L2={name:'Lower B',sub:'Tek bacak + kalça, diz kontrolü (kardiyo yapılamayan gün)',rows:[
-  {tip:'bb',ex:'Bulgarian split squat DB',rep:'8/bacak',rest:'90 sn',min:7,hv:'6/bacak',pk:'6/bacak',cap3:true},
-  {tip:'bb',ex:'Hip thrust barbell',rep:'10',rest:'90 sn',min:6,hv:'8',pk:'8',cap3:true},
+S.L2={name:'Lower B',sub:'Lower A\'nın tamamlayıcısı (kardiyo yapılamayan gün, bonus)',rows:[
+  {tip:'bb',ex:'Leg press',rep:'8-12',rest:'90 sn',min:6,hv:'6-10',pk:'6-10'},
+  {tip:'bb',ex:'Bulgarian split squat DB',rep:'8/bacak',rest:'90 sn',min:7,hv:'6/bacak',pk:'6/bacak',cap3:true,note:'Dizde ağrı varsa atla'},
   {tip:'circ',ex:'Devre 1',det:'KB swing 16 kg x15 + kablo hip abduction x12/bacak',rest:'tur arası 45 sn',min:5.5},
-  {tip:'bb',ex:'DB reverse lunge',rep:'10/bacak',rest:'75 sn',min:6,hv:'8/bacak',pk:'8/bacak',cap3:true},
   {tip:'t',ex:'Leg extension',rep:'10-12',rest:'60 sn',min:3,note:'Diz 90° ile 45° arası, ağrısız aralık'},
   {tip:'ss',ex:'Baldır süperset',det:'Seated calf raise x15 + tek bacak calf raise x12/bacak',rep:'2 tur',rest:'45 sn',min:4.5,t:true},
   {tip:'ss',ex:'Core süperset',det:'Bench leg raise x12-15 + kablo Pallof press x12/yan',rep:'3 tur',rest:'45 sn',min:5.5},
