@@ -653,11 +653,12 @@ const COMBOS={
  '3G2R':{lab:'3 gym + 2 koşu',note:'Ana hafta. Kardiyo yapamadığın gün yerine Lower B.',slots:['U3','L3','U2','RUN','RUN2'],days:['U3','L3','o','RUN2','U2','o','RUN']},
  '3G1V1R':{lab:'3 gym + 1 koşu + 1 VO2',note:'Ana hafta. Kardiyo yapamadığın gün yerine Lower B.',slots:['U3','L3','U2','VO2','RUN'],days:['U3','L3','o','VO2','U2','o','RUN']},
  '2G1V1R':{lab:'2 gym + 1 koşu + 1 VO2',note:'Az gidebildiğin hafta: iki full body.',slots:['FA','FB','VO2','RUN'],days:['FA','o','VO2','FB','o','RUN','o']},
+ 'TRG':{lab:'Seyahat: otel gym',note:'Ana plan deload setleriyle (barbell 2 set, T hareketleri 1 set). Ağırlıklar normal, hacim yarım. En az 2 seans.',slots:['U3','L3','U2','RUN'],travel:true,min:2},
  'TRB':{lab:'Seyahat: oda, aletli',note:'Bant ve ip ile tam seanslar (~40 dk). En az 2 seans.',slots:['Y:BUA','Y:BLA','Y:BUB','Y:BLB','RUN'],travel:true,min:2},
  'TRC':{lab:'Seyahat: oda, kısa',note:'Hızlı C1/C2 devreleri (~22 dk), dönüşümlü. En az 2 seans.',slots:['Y:C1','Y:C2','Y:C1','RUN'],travel:true,min:2}
 };
 const ORDER=['UA','LA','UB','LB'];
-function comboFor(w){DB.combos=DB.combos||{};if(DB.combos[w]&&COMBOS[DB.combos[w]])return DB.combos[w];const p=phase(w);if(p.travel&&!p.home)return 'TRB';return ls('combo')&&COMBOS[ls('combo')]?ls('combo'):'3G1V1R';}
+function comboFor(w){DB.combos=DB.combos||{};if(DB.combos[w]&&COMBOS[DB.combos[w]])return DB.combos[w];const p=phase(w);if(p.travel&&!p.home)return 'TRG';return ls('combo')&&COMBOS[ls('combo')]?ls('combo'):'3G1V1R';}
 function setCombo(k){DB.combos=DB.combos||{};DB.combos[week]=k;if(!COMBOS[k].travel)ls('combo',k);pend().meta=true;save();syncLater();render(true);}
 function slotMeta(s,ph){
   if(s==='RUN2')return {t:'RUN',label:'Kolay koşu'};
@@ -942,7 +943,7 @@ function viewYol(){
   ${body}
   ${y.vo2?'':`<details><summary>Soğuma, 4 dk</summary><ul class="warm">${YCOOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>`}
   <details><summary>Yol kuralları</summary><ul>
-   <li>Hafta ekranında "Seyahat: oda, aletli" veya "Seyahat: oda, kısa" seçince bu seanslar o haftanın planı olur.</li>
+   <li>Hafta ekranında "Seyahat: oda, aletli" veya "Seyahat: oda, kısa" seçince bu seanslar o haftanın planı olur. Otelde salon varsa "Seyahat: otel gym": ana plan, deload setleriyle.</li>
    <li>Hızlı seanslar C1, C2 dönüşümlü. Üç gün hızlı yapılacaksa C1, C2, C1.</li>
    <li>Yolda hangi kademede olursan ol haftada en az 2 seans.</li>
    <li>Otelde salon varsa ana plan: leg press → goblet squat, chest press → DB press, lat pulldown → DB row.</li>
