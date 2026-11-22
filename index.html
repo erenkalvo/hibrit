@@ -304,7 +304,7 @@ function exerciseRows(k){
   const ph=phase(week);
   let total=0;
   const rows=tpl(k,week===todayWeek()?iso():wkStartIso(week)).rows.map((r,i)=>{
-    const ps=phaseSets(r,ph);const mn=rowMin(r,ph);total+=mn;
+    const ps=phaseSets(r,ph);const mn=rowMin(r,ph);total+=r.opt?0:mn;
     const id=k+i;const isDone=done[id];
     let main='',sub='';
     if(r.tip==='bb'){main=`${r.ex}`;sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`+(r.note?'. '+r.note:'');}
@@ -336,6 +336,7 @@ function viewKural(){
    <li><b>Ana hafta</b>: Upper A, Lower A, Upper B ve 2 koşu.</li>
    <li><b>Koşu</b>: Runna yönetir. Haftada tek sert koşu.</li>
    <li><b>Koşu yapamadığın gün</b>: bike VO2 ya da Lower B.</li>
+   <li><b>Kısa VO2</b>: Upper A'nın sonunda opsiyonel, 18 dk. Haftada toplam tek VO2.</li>
    <li><b>2 gym haftası</b>: Full A ve Full B.</li>
    <li>Lower A ve Full Body'nin ertesi günü sert koşu ya da VO2 yok.</li>
    <li>Sıkışık haftada önce sert koşu kısalır, sonra uzun koşu, en son gym.</li>
@@ -654,7 +655,8 @@ Object.assign(S,{
   {tip:'t',ex:'Makine shoulder press',rep:'6-10',rest:'90 sn',min:4.5},
   {tip:'ss',ex:'Omuz süperseti',det:'DB lateral raise x10-15 + face pull x12-15',rep:'2 tur',rest:'60 sn',min:5,t:true},
   {tip:'ss',ex:'Kol süperseti',det:'Triceps pushdown x8-12 + hammer curl x8-12',rep:'2 tur',rest:'60 sn',min:5,t:true},
-  {tip:'ss',ex:'Core süperseti',det:'Kablo crunch x10-15 + bench leg raise x10-15',rep:'2 tur',rest:'45 sn',min:4.5,t:true}
+  {tip:'ss',ex:'Core süperseti',det:'Kablo crunch x10-15 + bench leg raise x10-15',rep:'2 tur',rest:'45 sn',min:4.5,t:true},
+  {tip:'int',ex:'Kısa VO2 (opsiyonel)',det:'Bike 4 tekrar: 3 dk sert, 2 dk hafif. Ayrı ısınma yok, ilk tekrarı kontrollü aç. Sert kısmın sonunda nabız 165-175. O hafta ayrı VO2 seansı yaptıysan ya da ertesi gün sert koşu varsa atla',min:18,opt:true}
  ]},
  U2:{name:'Upper B',sub:'Ana hareket çekme. Göğüs 4, sırt 8, omuz 6, kol 4 set',rows:[
   {tip:'bb',ex:'Yardımlı barfiks',rep:'6-8',rest:'120 sn',min:7.5,hv:'6-8',pk:'5-6',note:N_BARFIKS},
@@ -751,7 +753,7 @@ function slotsStatus(w){
   const extra=done.filter((d,j)=>!used.has(j));
   return {list,extra,c};
 }
-function gymMin(k,ph,d){return tpl(k,d).rows.reduce((a,r)=>a+rowMin(r,ph),0);}
+function gymMin(k,ph,d){return tpl(k,d).rows.reduce((a,r)=>a+(r.opt?0:rowMin(r,ph)),0);}
 
 
 /* ---------- SENKRON (Google Sheets) ---------- */
