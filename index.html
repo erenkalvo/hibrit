@@ -140,7 +140,7 @@ td{color:var(--ink2)}td:first-child{color:var(--ink)}
 const START=new Date(2026,8,28), NW=31;
 function todayWeek(){const d=Math.floor((new Date()-START)/864e5);return Math.min(NW,Math.max(1,Math.floor(d/7)+1));}
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v);}catch(e){return null;}}
-let week=todayWeek(), tab='hafta', combo=ls('combo')||'3G1V1R', session='UA', done={};
+let week=todayWeek(), tab='hafta', combo=ls('combo')||'3G2R', session='UA', done={};
 let gymPtr=parseInt(ls('gymPtr')||'0',10)||0;
 const MON=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
 function wkRange(w){const a=new Date(START);a.setDate(a.getDate()+7*(w-1));const b=new Date(a);b.setDate(b.getDate()+(w===NW?4:6));
@@ -151,11 +151,11 @@ const BL={
  adapt1:{blk:'Adaptasyon 1',bb:2,rir:'3 tekrar cepte',t:1,tFail:false,circ:2,light:true,mode:'vol',note:'Ağırlıkları hafif seç, hareketleri ve süreyi oturt. T hareketleri tükenmeye değil, 2 tekrar cepte. VO2 yok.'},
  adapt2:{blk:'Adaptasyon 2',bb:3,rir:'2 tekrar cepte',t:2,tFail:true,circ:3,mode:'vol',note:'Tam seans ilk kez. Barbell 3 set, T hareketleri 2 set tükenmeye. Bu hafta çalışma ağırlıklarını bul.'},
  vol1:{blk:'Blok 1 Hacim',bb:3,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'vol',note:'Barbell 3 set, her hafta ağırlık artışı hedef. İlerleme kuralı devrede.'},
- vol2:{blk:'Blok 2 Hacim',bb:4,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'vol',note:'Ana barbell hareketlerine 4. set eklendi (bench, squat, shoulder press, RDL).'},
- int1:{blk:'Blok 3 Yoğunluk',bb:4,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'int',note:'Tekrarlar düşüyor, ağırlık yükseliyor. Devreler 3 tur, kısa ve sert.'},
- int2:{blk:'Blok 4 Yoğunluk 2',bb:4,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'int',note:'Yoğunluk devam. Koşu uzun koşu tarafına kayıyor.'},
+ vol2:{blk:'Blok 2 Hacim',bb:4,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'vol',note:'Seansta tek ana hareket 4 set, diğer tüm hareketler 2 set tükenmeye.'},
+ int1:{blk:'Blok 3 Yoğunluk',bb:4,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'int',note:'Ana hareket 4 set, ağırlık yükseliyor. Diğerleri 2 set tükenmeye.'},
+ int2:{blk:'Blok 4 Yoğunluk 2',bb:4,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'int',note:'Yoğunluk devam. Ana hareket 4 set, diğerleri 2 set tükenmeye.'},
  peak:{blk:'Blok 5 Zirve',bb:4,rir:'1 tekrar cepte',t:2,tFail:true,circ:3,mode:'peak',note:'Ağırlıklar en yüksek, tekrarlar en düşük. Toparlanmaya dikkat, recovery kırmızıysa sert seansı kaydır.'},
- fin:{blk:'Blok 6 Final',bb:3,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'int',runFirst:true,note:'Barbell bilerek 3 sete indi, ağırlık korunuyor. Öncelik koşu, bacaklar 10K için taze kalsın.'},
+ fin:{blk:'Blok 6 Final',bb:3,rir:'1-2 tekrar cepte',t:2,tFail:true,circ:3,mode:'int',runFirst:true,note:'Ana hareket bilerek 3 sete indi, ağırlık korunuyor. Öncelik koşu, bacaklar 10K için taze kalsın.'},
  dl:{blk:'Deload + test',bb:2,rir:'2-3 tekrar cepte',t:1,tFail:true,circ:2,light:true,mode:'vol',deload:true,note:'Hafif hafta: ağırlıklar aynı, hacim yarım. Bu haftanın işi test, bkz. Testler.'},
  tr:{blk:'Seyahat',bb:2,rir:'2-3 tekrar cepte',t:1,tFail:true,circ:2,light:true,mode:'vol',travel:true,note:'Yol sekmesindeki planlar. Haftada en az 2 seans. Otelde salon varsa ana plan, deload setleriyle.'}
 };
@@ -251,8 +251,8 @@ const S={
  ]}
 };
 
-const WARM=['2 dk bike, hafif','Diz bloğu: band side walk x10/yan + tek bacak calf raise x12/bacak','Cat-cow x8','Göğüs kafesi rotasyonu x6/yan','Band pull-apart x15','Scapular push-up x10','Glute bridge x12','Sopa ile kalça menteşesi x10'];
-const WARM_LOWER=['Tibialis raise x20 (sırt duvarda, ayak ucunu kaldır)','Bacak sallama x10/yan','Vücut ağırlığı goblet squat x10'];
+const WARM=['3 dk bike ya da kürek, hafif','Cat-cow x8','Göğüs kafesi rotasyonu x6/yan','Band pull-apart x15','Scapular push-up x10','İlk hareketin 2 ısınma seti: yarı kilo x8, sonra dörtte üç kilo x4'];
+const WARM_LOWER=['3 dk bike, hafif','Band side walk x10/yan','Tibialis raise x20 (sırt duvarda, ayak ucunu kaldır)','Glute bridge x12','Bacak sallama x10/yan','Pogo zıplama 2 x 15 (ayak bileğinden, alçak). Dizde ağrı olursa çıkar','İlk hareketin 2 ısınma seti: yarı kilo x8, sonra dörtte üç kilo x4'];
 const COOL=['Kapı veya rig göğüs germe 40 sn/yan','Rig lat germe 40 sn/yan','Child\'s pose 60 sn','Kalça fleksör germe 40 sn/yan','Hamstring germe 40 sn/yan','Sırtüstü 90/90 nefes 2 dk'];
 
 /* ---------- HAFTA KOMBİNASYONLARI ---------- */
@@ -264,7 +264,7 @@ function go(t){tab=t;armed=null;render();}
 function repFor(row,ph){if(ph.mode==='peak'&&row.pk)return row.pk;if(ph.mode!=='vol'&&row.hv)return row.hv;return row.rep;}
 function phaseSets(row,ph){
   if(row.tip==='bb'){const st=row.cap3?Math.min(ph.bb,3):ph.bb;return {sets:st,rep:repFor(row,ph)};}
-  if(row.tip==='t') return {sets:ph.t,rep:ph.mode==='vol'?row.rep:'6-10'};
+  if(row.tip==='t') return {sets:ph.t,rep:row.rep};
   if(row.tip==='circ') return {sets:ph.circ,rep:null};
   if(row.tip==='ss') return {sets:row.t?ph.t:(ph.light?2:3),rep:null};
   return {sets:null,rep:row.rep};
@@ -310,7 +310,7 @@ function exerciseRows(k){
     if(r.tip==='bb'){main=`${r.ex}`;sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`+(r.note?'. '+r.note:'');}
     else if(r.tip==='t'){main=`${r.ex}<span class="chip">T</span>`;sub=`${ps.sets} set x ${ps.rep} ${ph.tFail?'tükenmeye':'2 tekrar cepte'}, ${r.rest}`+(r.note?'. '+r.note:'');}
     else if(r.tip==='circ'){main=`${r.ex}<span class="chip g">devre</span>`;sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
-    else if(r.tip==='ss'){main=`${r.ex}${r.t?'<span class="chip">T</span>':''}`;sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
+    else if(r.tip==='ss'){main=`${r.ex}${r.t?'<span class="chip">T</span>':''}`;sub=`${r.det}. ${ps.sets} tur, ${r.rest}`+(r.note?'. '+r.note:'');}
     else if(r.tip==='int'){main=`${r.ex}<span class="chip b">interval</span>`;sub=ph.light?r.det.replace(/x\d+/,m=>'x'+Math.ceil(parseInt(m.slice(1))/2)):r.det;}
     else{main=r.ex;sub=`${r.rep}, ${r.rest}`+(r.note?'. '+r.note:'');}
     return `<div class="row ${isDone?'done':''}" onclick="done['${id}']=!done['${id}'];render(true)"><div class="n">${i+1}</div><div class="t"><b>${main}</b><span>${sub}</span></div><div class="m">~${mn%1?mn.toFixed(1):mn} dk</div></div>`;
@@ -319,62 +319,65 @@ function exerciseRows(k){
 }
 
 function viewKural(){
-  const tb=[['Adaptasyon 1 (H1)','2 set, 3 cepte','1 set, 2 cepte','2 tur, yarım'],
-   ['Adaptasyon 2 (H4)','3 set, 2 cepte','2 set T','3 tur'],
-   ['Blok 1 Hacim (H5-8)','3 set, 8-10 / 6-8','2 set T, 8-12','3 tur'],
-   ['Blok 2 Hacim (H9-12)','4 set, aynı tekrar','2 set T','3 tur'],
-   ['Blok 3-4 Yoğunluk (H14-22)','4 set, 6-8 / 5-6','2 set T, 6-10','3 tur'],
-   ['Blok 5 Zirve (H23-27)','4 set, 5-6 / 4-5','2 set T, 6-10','3 tur'],
-   ['Blok 6 Final (H28-30)','3 set, ağır, koruma','2 set T','3 tur'],
-   ['Deload / seyahat','2 set','1 set','2 tur, yarım']];
+  const tb=[['Blok 2 Hacim (H9-12)','4 set x 6-8','2 set'],
+   ['Deload + test (H13, H17)','2 set','1 set'],
+   ['Blok 3-4 Yoğunluk (H14-22)','4 set x 6-8','2 set'],
+   ['Blok 5 Zirve (H23-27)','4 set x 5-6','2 set'],
+   ['Blok 6 Final (H28-30)','3 set, ağır','2 set'],
+   ['Seyahat','2 set','1 set']];
   return `<h1>Kurallar</h1>
-  <h2>Set akışı</h2>
-  <div class="card"><table><tr><th>Dönem</th><th>Barbell ana</th><th>T</th><th>Devre</th></tr>${tb.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</table></div>
+  <h2>Öncelik</h2>
   <ul>
-   <li><b>Barbell ana</b>: bench, squat, makine shoulder press, RDL. 4. set sadece bunlara gelir. Lunge, Bulgarian ve hip thrust en fazla 3 set.</li>
-   <li><b>T hareketleri</b> (makine, kablo, izole): son tekrarı temiz çıkaramayana kadar. Set biter, zorlama yok.</li>
-   <li><b>Barfiks ve şınav</b>: set sayısı değişmez, beceri gibi çalışır. Haftada 2 kez.</li>
-   <li><b>Devre ve interval</b>: dürüst etiket. Devre = belirli tur, tur arası dinlenme. Interval = süre sabit, sert/hafif.</li>
+   <li><b>1. Kas kazanımı.</b> Sıkışık haftada gym en son kısalır.</li>
+   <li><b>2. Yağ yakımı, VO2 ve koşu</b>, üçü eşit.</li>
   </ul>
+  <h2>Hafta</h2>
+  <ul>
+   <li><b>Ana hafta</b>: Upper A, Lower A, Upper B ve 2 koşu.</li>
+   <li><b>Koşu</b>: Runna yönetir. Haftada tek sert koşu.</li>
+   <li><b>Koşu yapamadığın gün</b>: bike VO2 ya da Lower B.</li>
+   <li><b>2 gym haftası</b>: Full A ve Full B.</li>
+   <li>Lower A ve Full Body'nin ertesi günü sert koşu ya da VO2 yok.</li>
+   <li>Sıkışık haftada önce sert koşu kısalır, sonra uzun koşu, en son gym.</li>
+  </ul>
+  <h2>Set kuralı</h2>
+  <ul>
+   <li><b>Ana hareket</b>: her seansta bir tane, listenin ilk satırı. 4 set, tükenmeye 1-2 tekrar kala bırak.</li>
+   <li><b>Diğer tüm hareketler</b> (T işaretli): 2 set, ikisi de tükenmeye. Son tekrarı temiz çıkaramadığın an set biter.</li>
+   <li>Tekrar aralığı bileşik hareketlerde 6-10. Kol, lateral raise, baldır ve core'da 8-15, düşük tekrarda form bozuluyor.</li>
+   <li>Setler arası: ana harekette 2 dk, diğerlerinde 75-90 sn. Süpersette iki hareket arka arkaya, sonra dinlen.</li>
+  </ul>
+  <div class="card"><table><tr><th>Dönem</th><th>Ana hareket</th><th>Diğerleri</th></tr>${tb.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('')}</table></div>
+  <h2>Haftalık hacim</h2>
+  <div class="card"><table><tr><th>Bölge</th><th>Upper A</th><th>Upper B</th><th>Toplam</th></tr>
+   <tr><td>Göğüs</td><td>8</td><td>4</td><td>12 set</td></tr>
+   <tr><td>Sırt</td><td>4</td><td>8</td><td>12 set</td></tr>
+   <tr><td>Omuz</td><td>6</td><td>6</td><td>12 set</td></tr>
+   <tr><td>Triceps</td><td>2</td><td>2 + dips</td><td>4 set</td></tr>
+   <tr><td>Biceps</td><td>2</td><td>2</td><td>4 set</td></tr>
+  </table></div>
+  <p class="hint">Bacak: Lower A'da 22 set ve haftada 2 koşu.</p>
   <h2>İlerleme</h2>
   <ul>
-   <li><b>Barbell</b>: tüm setlerde üst tekrara ulaşınca ağırlık artar. Üst vücut +2.5 kg, alt vücut +5 kg. Yeni blokta tekrar düşünce ağırlık bir kademe yukarıdan başlar.</li>
-   <li><b>T hareketleri</b>: 2 sette de aralığın üstüne ulaşınca bir kademe artır.</li>
-   <li><b>Barfiks</b>: bantlı 3x8 çıkınca bir ince bant. Negatiflerde 5 sn iniş rahatlayınca 8 sn.</li>
-   <li><b>Şınav</b>: 3x20 olunca ayak bench'te. Devredeki şınav 10 → 12 → 15.</li>
-   <li><b>Kettlebell</b>: swing 16'da 20 tekrar rahatlayınca 20 kg.</li>
-   <li>İlerlemeyen hareket iki hafta üst üste aynıysa ağırlığı %10 düşür, yeniden inşa et.</li>
-  </ul>
-  <h2>Hafta düzeni</h2>
-  <ul>
-   <li>Haftada en az 1 koşu. Koşusuz kombinasyonlar seyrek.</li>
-   <li>Haftanın başında planı seç: 3 gym (Upper A, Upper B, Lower A) + 2 kardiyo, ya da 2 gym (Full A, Full B) + 2 kardiyo. Kardiyo yapamadığın gün yerine Lower B. Her kas haftada en az 2 kez çalışır.</li>
-   <li>Lower ve Full Body gününün ertesine VO2 veya uzun koşu gelmez. Aynı patern arasında en az 48 saat.</li>
-   <li>Aynı gün iki seans olabilir: sabah koşu, akşam gym. Sabah gym akşam VO2 olmaz.</li>
-   <li>Haftada en az 3 seans, seyahatte en az 2. WHOOP recovery kırmızıysa o günün seansı hafif olur veya kayar.</li>
-  </ul>
-  <h2>Opsiyoneller</h2>
-  <ul>
-   <li><b>Tabata</b> (H14+, bike haftaları): VO2 seansında 5x4 yerine 2 x Tabata. Ek değil, alternatif.</li>
-   <li><b>EMOM</b>: gym seansının sonundaki interval yerine 10 dk EMOM seçilebilir.</li>
-   <li><b>Bonus kondisyon</b>: 20 dk EMOM veya AMRAP, haftada en fazla 1, recovery yeşilse, Lower ertesi değil. Deload haftasında önerilmez.</li>
-  </ul>
-  <h2>Deload ve seyahat</h2>
-  <ul>
-   <li>Deload: 13, 17, 31. hafta. Seyahat: 7, 20-21, 25, 29. hafta, hafif hafta sayılır.</li>
-   <li>Ağırlıklar aynı, hacim düşük. Testler bu haftalarda.</li>
+   <li>Tüm setlerde aralığın üst tekrarına ulaşınca kiloyu artır: üst vücut +2.5 kg, bacak +5 kg, makinede bir kademe.</li>
+   <li><b>Yardımlı barfiks ve dips</b>: kg alanına yardım kilosunu yaz. Tüm setlerde üst tekrara ulaşınca yardımı 5 kg azalt. Hedef yardımsız ilk barfiks.</li>
+   <li>İki hafta üst üste ilerlemeyen harekette kiloyu %10 düşür, yeniden çık.</li>
   </ul>
   <h2>Diz ve bacak</h2>
   <ul>
-   <li>Bacak günlerinde zıplama yok. Kondisyon spin bike'ta.</li>
-   <li>Antrenman sırasında dizdeki ağrı 10 üzerinden 3'ü geçmesin. Geçerse yükü düşür ya da hareketi bırak.</li>
-   <li>Ertesi sabah ağrı başlangıç seviyesine döndüyse yükü artırabilirsin. Dönmediyse bir hafta aynı yükte kal.</li>
-   <li>Step-down ve tek bacak hareketlerinde diz ikinci parmağın hizasında kalsın, içe kaçmasın. İniş yavaş.</li>
-   <li>Kalite koşusunun (VO2, tempo) bir gün öncesine Lower koyma.</li>
+   <li>Antrenmanda dizdeki ağrı 10 üzerinden 3'ü geçmesin. Geçerse yükü düşür ya da hareketi bırak.</li>
+   <li>Zıplama sadece ısınmadaki pogo. Ağrı dönerse ilk o çıkar.</li>
+   <li>Step-down ve tek bacak hareketlerinde diz ikinci parmağın hizasında kalsın, içe kaçmasın.</li>
    <li>Ağrı dinlenmeye rağmen geri geliyorsa ya da şişlik, kilitlenme varsa fizyoterapiste göster.</li>
   </ul>
+  <h2>Deload ve seyahat</h2>
+  <ul>
+   <li>Deload: 13, 17, 31. hafta. Seyahat: 20-21, 25, 29. hafta.</li>
+   <li>Ağırlıklar aynı, set sayısı yarım. Testler bu haftalarda.</li>
+   <li>WHOOP recovery kırmızıysa o günün sert seansını kaydır.</li>
+  </ul>
   <h2>Isınma ve soğuma</h2>
-  <p>Her seansta 7 + 7 dk, atlanmaz. Kürek kemiği ve bel için doktor tavsiyesi bu. Süre kısıtlıysa kısalan şey interval olur, ısınma değil.</p>`;
+  <p>Her seansta 7 + 7 dk, atlanmaz. Kürek kemiği ve bel için doktor tavsiyesi bu.</p>`;
 }
 
 function viewBesin(){
@@ -422,11 +425,12 @@ function sorted(){return DB.sessions.slice().sort((a,b)=>a.date<b.date?-1:a.date
 function weekSessions(w){return sorted().filter(s=>weekOf(s.date)===w);}
 function topRep(t){const n=(String(t||'').split('/')[0].match(/\d+/g)||[]).map(Number);return n.length?Math.max(...n):0;}
 function lastOf(name){const l=sorted();for(let i=l.length-1;i>=0;i--){const e=l[i].ex&&l[i].ex[name];if(e&&e.s&&e.s.length)return Object.assign({date:l[i].date},e);}return null;}
-const LOWER5=['Barbell back squat','Barbell RDL','Hip thrust barbell','Leg press'];
+const LOWER5=['Barbell back squat','Barbell RDL','Hip thrust barbell','Leg press','Hack squat','Hip thrust makinesi'];
 function suggest(name,cur,last){
   if(!last||!last.s.length)return '';
   const lt=topRep(last.t),ct=topRep(cur);
   if(lt&&ct&&ct<lt)return 'Tekrar aralığı düştü, bir kademe ağır başla';
+  if(/^Yardımlı/.test(name))return (lt&&last.s.every(x=>(x.r||0)>=lt))?`Son seferde tüm setler ${lt} tekrar: yardımı 5 kg azalt`:'Aynı yardımla devam, tekrarı artır';
   if(lt&&last.s.every(x=>(x.r||0)>=lt)){
     const inc=LOWER5.includes(name)?'+5 kg':(/Barbell|shoulder press/i.test(name)?'+2.5 kg':'bir kademe');
     return `Son seferde tüm setler ${lt} tekrar: ${inc} dene`;
@@ -457,7 +461,7 @@ function rowText(r,ph){
   if(r.tip==='bb'){sub=`${ps.sets} set x ${ps.rep}, ${r.rest} ara, ${ph.rir}`+(r.note?'. '+r.note:'');}
   else if(r.tip==='t'){main+='<span class="chip">T</span>';sub=`${ps.sets} set x ${ps.rep} ${ph.tFail?'tükenmeye':'2 tekrar cepte'}, ${r.rest}`+(r.note?'. '+r.note:'');}
   else if(r.tip==='circ'){main+='<span class="chip g">devre</span>';sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
-  else if(r.tip==='ss'){main+=r.t?'<span class="chip">T</span>':'';sub=`${r.det}. ${ps.sets} tur, ${r.rest}`;}
+  else if(r.tip==='ss'){main+=r.t?'<span class="chip">T</span>':'';sub=`${r.det}. ${ps.sets} tur, ${r.rest}`+(r.note?'. '+r.note:'');}
   else if(r.tip==='int'){main+='<span class="chip b">interval</span>';sub=ph.light?r.det.replace(/x\d+/,m=>'x'+Math.ceil(parseInt(m.slice(1))/2)):r.det;}
   else{sub=`${r.rep}, ${r.rest}`+(r.note?'. '+r.note:'');}
   return {main,sub,ps};
@@ -538,14 +542,14 @@ function viewLog(){
   const a=DB.active;const w=weekOf(a.date);const ph=phase(w);let body;
   if(S[a.type])body=logGym(a);
   else if(a.type.startsWith('Y:'))body=logYol(a);
-  else if(a.type==='VO2')body=logCardio(a,ph.vo2Off?'Bu hafta VO2 yok, kolay koşu olarak kaydedilir.':`${ph.bike?'Spin bike':'Koşu'}: ${ph.vo2}`);
-  else if(a.type==='RUN')body=logCardio(a,'5 dk yürüyüş, '+ph.run+', 5 dk yürüyüş.');
+  else if(a.type==='VO2')body=logCardio(a,ph.travel?IPVO2:ph.light?'Bike: 10 dk ısınma, 3 x (3 dk orta sert / 3 dk hafif), 5 dk soğuma.':'Bike: 10 dk ısınma, 4 x (4 dk sert / 3 dk hafif), 5 dk soğuma. Başka seçenek yaptıysan nota yaz. Nabız alanına sert bölümlerin sonundaki en yüksek nabzı gir.');
+  else if(a.type==='RUN')body=logCardio(a,'Runna\'daki antrenman. Süre, mesafe ve ortalama nabzı gir, nota antrenmanın adını yaz.');
   else body=logCardio(a,'EMOM 12 dk (tek dk 15 KB swing, çift dk 8 burpee) veya AMRAP 12 dk. Notta hangisi ve kaç tur yazsın.');
   const lower=LOWERISH.includes(a.type);
   return `<h1>${tName(a.type)}</h1>
   <p>Hafta ${w}, ${ph.name}</p>
   <label class="set wide date"><span>Tarih</span><input type="date" value="${a.date}" onchange="DB.active.date=this.value;save();render(true)"></label>
-  ${S[a.type]?`<details><summary>Isınma, 7 dk</summary><ul class="warm">${WARM.concat(lower?WARM_LOWER:[]).map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
+  ${S[a.type]?`<details><summary>Isınma, 7 dk</summary><ul class="warm">${(lower?WARM_LOWER:WARM).map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
   <div class="card">${body}${S[a.type]?`<div class="sum"><span>Net iş</span><b>~${Math.round(gymMin(a.type,ph,a.date))} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(gymMin(a.type,ph,a.date))+14} dk</b></div>`:''}</div>
   ${S[a.type]?`<details><summary>Soğuma, 7 dk</summary><ul class="warm">${COOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>`:''}
   <textarea class="note" placeholder="Not (opsiyonel)" oninput="DB.active.note=this.value;save()">${a.note||''}</textarea>
@@ -632,6 +636,79 @@ S.L2={name:'Lower B',sub:'Lower A\'nın tamamlayıcısı (kardiyo yapılamayan g
   {tip:'ss',ex:'Core süperset',det:'Bench leg raise x12-15 + kablo Pallof press x12/yan',rep:'3 tur',rest:'45 sn',min:5.5},
   {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
 ]};
+const TPL_V2={U3:S.U3,U2:S.U2,L3:S.L3,L2:S.L2,FA:S.FA,FB:S.FB};
+const TPL_V2_END='2026-11-23';
+/* ---------- 23 KASIM 2026: YENİ SALON ---------- */
+/* Kural: seansta tek ana hareket 4 set, gerisi 2 set tükenmeye. Haftalık göğüs 12, sırt 12, omuz 12 set. */
+const N_DIPS='Kg alanına yardım kilosunu yaz. Omuz ya da kürek kemiği rahatsız ederse alçaktan yükseğe kablo fly';
+const N_BARFIKS='Kg alanına yardım kilosunu yaz. Tüm setlerde 8 tekrar olunca yardımı 5 kg azalt';
+const R_DIZ={tip:'ss',ex:'Diz süperseti',det:'Step-down x8/bacak + tek bacak inişli leg extension x8/bacak',rep:'2 tur',rest:'60 sn',min:6,t:true,note:'Step-down 3 sn iniş. Leg extension: iki bacakla kaldır, tek bacakla 3 sn indir'};
+const R_BALDIR={tip:'ss',ex:'Baldır süperseti',det:'Standing calf raise x10-15 + seated calf raise x10-15',rep:'2 tur',rest:'45 sn',min:5,t:true};
+Object.assign(S,{
+ U3:{name:'Upper A',sub:'Ana hareket itme. Göğüs 8, sırt 4, omuz 6, kol 4 set',rows:[
+  {tip:'bb',ex:'Barbell bench press',rep:'6-8',rest:'120 sn',min:7.5,hv:'6-8',pk:'5-6'},
+  {tip:'t',ex:'Incline DB press',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Göğüs destekli row',rep:'6-10',rest:'90 sn',min:4.5,note:'Makine ya da eğimli bench\'te DB. Yoksa seated cable row'},
+  {tip:'t',ex:'Pec deck',rep:'8-12',rest:'75 sn',min:4,note:'Yoksa kablo fly'},
+  {tip:'t',ex:'Lat pulldown',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Makine shoulder press',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'ss',ex:'Omuz süperseti',det:'DB lateral raise x10-15 + face pull x12-15',rep:'2 tur',rest:'60 sn',min:5,t:true},
+  {tip:'ss',ex:'Kol süperseti',det:'Triceps pushdown x8-12 + hammer curl x8-12',rep:'2 tur',rest:'60 sn',min:5,t:true},
+  {tip:'ss',ex:'Core süperseti',det:'Kablo crunch x10-15 + bench leg raise x10-15',rep:'2 tur',rest:'45 sn',min:4.5,t:true}
+ ]},
+ U2:{name:'Upper B',sub:'Ana hareket çekme. Göğüs 4, sırt 8, omuz 6, kol 4 set',rows:[
+  {tip:'bb',ex:'Yardımlı barfiks',rep:'6-8',rest:'120 sn',min:7.5,hv:'6-8',pk:'5-6',note:N_BARFIKS},
+  {tip:'t',ex:'Chest press makinesi',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'DB tek kol row',rep:'6-10',rest:'75 sn',min:5},
+  {tip:'t',ex:'Makine shoulder press',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Yardımlı dips',rep:'6-10',rest:'90 sn',min:4.5,note:N_DIPS},
+  {tip:'t',ex:'Seated cable row',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'ss',ex:'Omuz süperseti',det:'Kablo lateral raise x10-15 + DB rear delt fly x12-15',rep:'2 tur',rest:'60 sn',min:5,t:true},
+  {tip:'ss',ex:'Kol süperseti',det:'DB curl x8-12 + kablo rope pushdown x8-12',rep:'2 tur',rest:'60 sn',min:5,t:true},
+  {tip:'t',ex:'DB shrug',rep:'10-12',rest:'45 sn',min:3}
+ ]},
+ L3:{name:'Lower A',sub:'Haftanın bacak günü: ön bacak, arka bacak, kalça, diz, baldır',rows:[
+  {tip:'bb',ex:'Leg press',rep:'6-8',rest:'120 sn',min:7.5,hv:'6-8',pk:'5-6',note:'Salonda hack squat daha iyiyse onu yap, nota yaz'},
+  {tip:'t',ex:'Tek bacak RDL',rep:'8/bacak',rest:'75 sn',min:5.5,note:'DB ya da KB. Boştaki el rack\'ten destek alabilir'},
+  {tip:'t',ex:'DB reverse lunge',rep:'8/bacak',rest:'75 sn',min:5.5,note:'Adım biraz uzun, kalçayı hisset'},
+  {tip:'t',ex:'Hip thrust makinesi',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Leg curl',rep:'6-10',rest:'75 sn',min:4},
+  R_DIZ,R_BALDIR,
+  {tip:'t',ex:'Kablo diz çekme',rep:'10/bacak',rest:'45 sn',min:4,note:'Hip flexor. Ayak bileği kayışı alt makarada, ayakta dizi kalça hizasına çek, yavaş indir'}
+ ]},
+ L2:{name:'Lower B',sub:'Koşu yapamadığın gün için ikinci bacak günü (bonus)',rows:[
+  {tip:'bb',ex:'Hack squat',rep:'6-8',rest:'120 sn',min:7.5,hv:'6-8',pk:'5-6',note:'Yoksa leg press, ayaklar platformda alçakta'},
+  {tip:'t',ex:'DB walking lunge',rep:'10/bacak',rest:'75 sn',min:5.5},
+  {tip:'t',ex:'DB RDL',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Leg extension',rep:'8-12',rest:'75 sn',min:4},
+  {tip:'t',ex:'Leg curl',rep:'6-10',rest:'75 sn',min:4},
+  {tip:'ss',ex:'Kalça ve baldır',det:'Kablo hip abduction x12/bacak + tek bacak calf raise x12/bacak',rep:'2 tur',rest:'45 sn',min:5,t:true},
+  {tip:'ss',ex:'Core süperseti',det:'Bench leg raise x10-15 + kablo Pallof press x12/yan',rep:'2 tur',rest:'45 sn',min:4.5,t:true}
+ ]},
+ FA:{name:'Full A',sub:'2 gym haftası. Ana hareketler bench ve leg press',rows:[
+  {tip:'bb',ex:'Barbell bench press',rep:'6-8',rest:'120 sn',min:7.5,hv:'6-8',pk:'5-6'},
+  {tip:'bb',ex:'Leg press',rep:'6-8',rest:'120 sn',min:7.5,hv:'6-8',pk:'5-6',cap3:true},
+  {tip:'t',ex:'Göğüs destekli row',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Tek bacak RDL',rep:'8/bacak',rest:'75 sn',min:5.5},
+  {tip:'t',ex:'Incline DB press',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Lat pulldown',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Makine shoulder press',rep:'6-10',rest:'90 sn',min:4.5},
+  R_DIZ,
+  {tip:'ss',ex:'Omuz ve kol',det:'DB lateral raise x10-15 + triceps pushdown x8-12',rep:'2 tur',rest:'60 sn',min:5,t:true}
+ ]},
+ FB:{name:'Full B',sub:'2 gym haftası. Ana hareket yardımlı barfiks',rows:[
+  {tip:'bb',ex:'Yardımlı barfiks',rep:'6-8',rest:'120 sn',min:7.5,hv:'6-8',pk:'5-6',note:N_BARFIKS},
+  {tip:'t',ex:'DB reverse lunge',rep:'8/bacak',rest:'75 sn',min:5.5},
+  {tip:'t',ex:'Chest press makinesi',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'Hip thrust makinesi',rep:'6-10',rest:'90 sn',min:4.5},
+  {tip:'t',ex:'DB tek kol row',rep:'6-10',rest:'75 sn',min:5},
+  {tip:'t',ex:'Yardımlı dips',rep:'6-10',rest:'90 sn',min:4.5,note:N_DIPS},
+  {tip:'t',ex:'Leg curl',rep:'6-10',rest:'75 sn',min:4},
+  {tip:'ss',ex:'Omuz süperseti',det:'Kablo lateral raise x10-15 + DB rear delt fly x12-15',rep:'2 tur',rest:'60 sn',min:5,t:true},
+  {tip:'ss',ex:'Kol süperseti',det:'DB curl x8-12 + kablo rope pushdown x8-12',rep:'2 tur',rest:'60 sn',min:5,t:true},
+  R_BALDIR
+ ]}
+});
 const OLD_TPL={U3:{name:'Upper',sub:'Eski Upper (20 Ekim ve öncesi)',rows:[
   {tip:'bb',ex:'Barbell bench press',rep:'8-10',rest:'90 sn',min:6.5,hv:'6-8',pk:'5-6'},
   {tip:'t',ex:'Lat pulldown',rep:'8-12',rest:'75 sn',min:3.5},
@@ -644,25 +721,25 @@ const OLD_TPL={U3:{name:'Upper',sub:'Eski Upper (20 Ekim ve öncesi)',rows:[
   {tip:'int',ex:'İntervaller',det:'Spin bike 20 sn sert / 40 sn hafif x6',min:6}
  ]}};
 const TPL_CHANGE='2026-10-21';
-function tpl(k,d){return (OLD_TPL[k]&&d&&d<TPL_CHANGE)?OLD_TPL[k]:S[k];}
+function tpl(k,d){if(OLD_TPL[k]&&d&&d<TPL_CHANGE)return OLD_TPL[k];if(TPL_V2[k]&&d&&d<TPL_V2_END)return TPL_V2[k];return S[k];}
 const LOWERISH=['LA','LB','L3','L2','F3','FA','FB'];
 Object.assign(TYPES,{UA:'Upper A (eski)',LA:'Lower A (eski)',UB:'Upper B (eski)',LB:'Lower B (eski)',U2:'Upper B',U3:'Upper A',L3:'Lower A',L2:'Lower B',F3:'Full Body',FA:'Full A',FB:'Full B'});
 
 /* ---------- KOMBİNASYONLAR ---------- */
 const COMBOS={
- '3G2R':{lab:'3 gym + 2 koşu',note:'Ana hafta. Kardiyo yapamadığın gün yerine Lower B.',slots:['U3','L3','U2','RUN','RUN2'],days:['U3','L3','o','RUN2','U2','o','RUN']},
- '3G1V1R':{lab:'3 gym + 1 koşu + 1 VO2',note:'Ana hafta. Kardiyo yapamadığın gün yerine Lower B.',slots:['U3','L3','U2','VO2','RUN'],days:['U3','L3','o','VO2','U2','o','RUN']},
- '2G1V1R':{lab:'2 gym + 1 koşu + 1 VO2',note:'Az gidebildiğin hafta: iki full body.',slots:['FA','FB','VO2','RUN'],days:['FA','o','VO2','FB','o','RUN','o']},
- 'TRG':{lab:'Seyahat: otel gym',note:'Ana plan deload setleriyle (barbell 2 set, T hareketleri 1 set). Ağırlıklar normal, hacim yarım. En az 2 seans.',slots:['U3','L3','U2','RUN'],travel:true,min:2},
+ '3G2R':{lab:'3 gym + 2 koşu',note:'Ana hafta. Koşuları Runna yönetir. Koşu yapamadığın gün yerine bike VO2 ya da Lower B.',slots:['U3','L3','U2','RUN2','RUN'],days:['U3','RUN2','L3','o','U2','RUN','o']},
+ '3G1V1R':{lab:'3 gym + 1 koşu + 1 VO2',note:'Tek koşu yapacağın hafta. İkinci kardiyo bike VO2.',slots:['U3','L3','U2','VO2','RUN'],days:['U3','VO2','L3','o','U2','RUN','o']},
+ '2G1V1R':{lab:'2 gym + 2 koşu',note:'Az gidebildiğin hafta: iki full body. Koşu yapamadığın gün yerine bike VO2.',slots:['FA','FB','RUN2','RUN'],days:['FA','RUN2','o','FB','o','RUN','o']},
+ 'TRG':{lab:'Seyahat: otel gym',note:'Ana plan deload setleriyle (ana hareket 2 set, diğerleri 1 set). Ağırlıklar normal, hacim yarım. En az 2 seans.',slots:['U3','L3','U2','RUN'],travel:true,min:2},
  'TRB':{lab:'Seyahat: oda, aletli',note:'Bant ve ip ile tam seanslar (~40 dk). En az 2 seans.',slots:['Y:BUA','Y:BLA','Y:BUB','Y:BLB','RUN'],travel:true,min:2},
  'TRC':{lab:'Seyahat: oda, kısa',note:'Hızlı C1/C2 devreleri (~22 dk), dönüşümlü. En az 2 seans.',slots:['Y:C1','Y:C2','Y:C1','RUN'],travel:true,min:2}
 };
 const ORDER=['UA','LA','UB','LB'];
-function comboFor(w){DB.combos=DB.combos||{};if(DB.combos[w]&&COMBOS[DB.combos[w]])return DB.combos[w];const p=phase(w);if(p.travel&&!p.home)return 'TRG';return ls('combo')&&COMBOS[ls('combo')]?ls('combo'):'3G1V1R';}
+function comboFor(w){DB.combos=DB.combos||{};if(DB.combos[w]&&COMBOS[DB.combos[w]])return DB.combos[w];const p=phase(w);if(p.travel&&!p.home)return 'TRG';return ls('combo')&&COMBOS[ls('combo')]?ls('combo'):'3G2R';}
 function setCombo(k){DB.combos=DB.combos||{};DB.combos[week]=k;if(!COMBOS[k].travel)ls('combo',k);pend().meta=true;save();syncLater();render(true);}
 function slotMeta(s,ph){
-  if(s==='RUN2')return {t:'RUN',label:'Kolay koşu'};
-  if(s==='RUN')return {t:'RUN',label:'Koşu'};
+  if(s==='RUN2')return {t:'RUN',label:'Koşu 1 (Runna)'};
+  if(s==='RUN')return {t:'RUN',label:'Koşu 2 (Runna)'};
   if(s==='VO2')return ph.vo2Off?{t:'RUN',label:'Kolay koşu (VO2 yerine)'}:{t:'VO2',label:'VO2'};
   if(s==='Y:YV')return {t:s,label:'VO2 ip'};
   return {t:s,label:s.startsWith('Y:')?'Oda '+Y[s.slice(2)].name.replace('Hızlı ',''):tName(s)};
@@ -670,7 +747,7 @@ function slotMeta(s,ph){
 function slotsStatus(w){
   const ph=phase(w),c=COMBOS[comboFor(w)];const done=weekSessions(w).slice();const used=new Set();
   const list=c.slots.map(s=>{const m=slotMeta(s,ph);const i=done.findIndex((d,j)=>!used.has(j)&&d.type===m.t);if(i>=0)used.add(i);return Object.assign({},m,{done:i>=0?done[i]:null});});
-  done.forEach((d,j)=>{if(used.has(j)||d.type!=='L2')return;const k=list.findIndex(x=>!x.done&&(x.t==='RUN'||x.t==='VO2'));if(k>=0){used.add(j);list[k]=Object.assign({},list[k],{label:'Lower B (kardiyo yerine)',done:d});}});
+  done.forEach((d,j)=>{if(used.has(j)||!['VO2','RUN','L2'].includes(d.type))return;const k=list.findIndex(x=>!x.done&&(x.t==='RUN'||x.t==='VO2')&&x.t!==d.type);if(k>=0){used.add(j);list[k]=Object.assign({},list[k],{label:{VO2:'Bike VO2 (koşu yerine)',RUN:'Koşu (VO2 yerine)',L2:'Lower B (kardiyo yerine)'}[d.type],done:d});}});
   const extra=done.filter((d,j)=>!used.has(j));
   return {list,extra,c};
 }
@@ -744,9 +821,9 @@ function viewHafta(){
   const normal=Object.keys(COMBOS).filter(k=>!COMBOS[k].travel),trav=Object.keys(COMBOS).filter(k=>COMBOS[k].travel);
   const cbtn=k=>`<button class="${k===ck?'on':''}" onclick="setCombo('${k}')">${COMBOS[k].lab}</button>`;
   const grid=c.days?`<div class="grid">${c.days.map((d,i)=>{let cls='o',txt='Dinlen';
-      if(S[d]){cls='g';txt=S[d].name;} else if(d==='VO2'){cls='v';txt=ph.vo2Off?'Kolay koşu':'VO2';} else if(d==='RUN'){cls='r';txt='Koşu';} else if(d==='RUN2'){cls='r';txt='Kolay koşu';}
+      if(S[d]){cls='g';txt=S[d].name;} else if(d==='VO2'){cls='v';txt=ph.vo2Off?'Kolay koşu':'VO2';} else if(d==='RUN'){cls='r';txt='Sert ya da uzun koşu';} else if(d==='RUN2'){cls='r';txt='Kolay koşu';}
       return `<div class="day ${cls}"><small>${names[i]}</small><b>${txt}</b></div>`;}).join('')}</div>
-    <p class="hint">Örnek diziliş, günleri sen seçiyorsun. Lower ve Full Body'nin ertesine VO2 veya uzun koşu koyma. Aynı gün sabah koşu akşam gym olabilir.</p>`:'';
+    <p class="hint">Örnek diziliş, günleri sen seçiyorsun. İki kural sabit: Lower A ve Full Body'nin ertesi günü sert koşu ya da VO2 yok, haftada tek sert kardiyo.</p>`:'';
   const bonusOk=!c.travel;
   return `
   ${msg?`<div class="toast">${msg}</div>`:''}
@@ -764,23 +841,39 @@ function viewHafta(){
     <div class="head"><b>${doneN} / ${list.length} seans${c.min?`, en az ${c.min}`:''}</b><small>${doneN>=target?'hedef tamam':''}</small></div>
     ${DB.active?'<p>Devam eden seansı bitirince yenisini başlatabilirsin.</p>':`<div class="opts">${list.map(slotBtn).join('')}</div>`}
     ${extra.length?`<p class="hint">Plan dışı: ${extra.map(s=>tName(s.type)+' ('+fmtDay(s.date)+')').join(', ')}</p>`:''}
-    ${!DB.active&&bonusOk&&list.some(x=>!x.done&&(x.t==='RUN'||x.t==='VO2'))?`<button class="big" onclick="startS('L2')">Kardiyo yerine: Lower B</button>`:''}
-    ${!DB.active?(bonusOk?`<button class="big" onclick="startS('COND')">Bonus: kondisyon (20 dk)</button>`:`<button class="big" onclick="startS('Y:YV')">Bonus: ip ile VO2 (20 dk)</button>`):''}
+    ${!DB.active&&bonusOk&&list.some(x=>!x.done&&x.t==='RUN')?`<button class="big" onclick="startS('VO2')">Koşu yerine: bike VO2</button><button class="big" onclick="startS('L2')">Koşu yerine: Lower B</button>`:''}
+    ${!DB.active&&!bonusOk?`<button class="big" onclick="startS('Y:YV')">Bonus: ip ile VO2 (20 dk)</button>`:''}
     ${!isNow&&!DB.active?'<p class="hint">Geçmiş bir haftaya kayıt giriyorsun, tarih o haftanın Pazartesi gününe ayarlanır. Seans ekranında değiştirebilirsin.</p>':''}
   </div>
   ${grid?`<details><summary>Örnek gün dizilişi</summary>${grid}</details>`:''}
   <div class="card tint">
     <b>Bu haftanın kardiyosu</b>
-    <p><b style="color:var(--rose)">VO2</b> ${ph.vo2Off||c.travel||ph.travel?'':ph.bike?'(bike haftası)':'(koşu haftası)'}: ${ph.vo2Off?'Bu hafta yok, yerine kolay koşu veya dinlenme':c.travel?IPVO2:ph.vo2}${ck==='3G2V'?'. İki VO2 arasında en az 48 saat, ikisi de bike olabilir.':''}</p>
-    <p><b style="color:var(--sage)">Koşu</b>: ${ph.run}</p>
-    ${ck==='3G2R'?'<p class="hint">Kolay koşu: 25-35 dk, sonunda 4 x 20 sn hızlanma.</p>':''}
-  </div>
-  ${bonusOk?`<details><summary>Bonus kondisyon nedir?</summary>
-    <p>İstersen haftada en fazla 1, sadece WHOOP recovery yeşilse, Lower veya Full Body ertesine değil.</p>
-    <ul><li><b>EMOM 12 dk</b>: tek dakikalar 15 KB swing 16 kg, çift dakikalar 8 burpee.</li>
-    <li><b>veya AMRAP 12 dk</b>: 10 goblet squat 16 kg, 8 şınav, 12 KB swing, 10 bicycle crunch/yan.</li></ul></details>`:''}`;
+    <p><b style="color:var(--sage)">Koşu</b>: Runna'daki antrenmanı yap, bitince buraya süre, mesafe ve nabzı gir. Haftada tek sert koşu.</p>
+    <p><b style="color:var(--rose)">VO2</b>: ${c.travel||ph.travel?IPVO2:ph.light?'Hafif hafta: bike 3 x 3 dk, rahat tempo.':'Koşu yapamadığın gün bike\'ta 4 x 4 dk. Nasıl yapılır: Seans sekmesi, VO2.'}</p>
+  </div>`;
 }
 
+const VO2_HTML=`<div class="card"><b>Ne zaman</b>
+ <p class="ink">Koşu yapamadığın gün, koşunun yerine. Haftada en fazla 1. Lower A'nın ertesi günü ve Runna'nın sert koşusunun bir gün öncesi ya da sonrası olmasın.</p>
+ <p class="ink">Alet: spin bike, assault bike ya da kürek. Üçü de dize darbe bindirmez.</p></div>
+ <div class="card"><b>Seçenek 1: 4 x 4 (asıl seans, 43 dk)</b>
+ <p class="ink">10 dk ısınma: hafif başla, son 3 dakikada 3 kez 20 sn hızlan.</p>
+ <p class="ink">4 tekrar: 4 dk sert, 3 dk çok hafif pedal.</p>
+ <p class="ink">5 dk soğuma.</p></div>
+ <div class="card"><b>Seçenek 2: 4 x 3 (zaman darsa, 30 dk)</b>
+ <p class="ink">7 dk ısınma, 4 tekrar: 3 dk sert, 2 dk hafif. 5 dk soğuma.</p></div>
+ <div class="card"><b>Seçenek 3: 30/30 (ilk iki sefer, 32 dk)</b>
+ <p class="ink">7 dk ısınma. 8 tekrar: 30 sn sert, 30 sn hafif. 3 dk hafif pedal. Aynı bloktan bir tane daha. 5 dk soğuma.</p>
+ <p class="hint">Sert kısımlar kısa olduğu için başlaması en kolay olan. İki seferden sonra 4 x 4'e geç.</p></div>
+ <div class="card tint"><b>Sert kısım nasıl olmalı</b>
+ <ul><li>Sprint değil. O süre boyunca tutabildiğin en yüksek sabit tempo.</li>
+ <li>Bike'ta 80-90 devir. Devir düşüyorsa direnç fazla, tempo çok rahatsa direnci artır.</li>
+ <li>İlk dakika idare eder, ikinci dakikadan sonra 3-4 kelimeden uzun konuşamazsın.</li>
+ <li>Nabız her tekrarın sonunda 165-175. Bu aralık WHOOP'un sana biçtiği maksimuma göre tahmin.</li>
+ <li>Dört tekrar aynı dirençte bitmeli. Son tekrarda çöküyorsan ilkini fazla sert açmışsın.</li>
+ <li>Hafif kısımda durma, pedal dönsün. Nabız 120-130'a insin.</li></ul>
+ <b>İlerleme</b>
+ <p>Dört tekrarı aynı dirençte rahat bitirdiysen sonraki sefer direnci bir kademe artır. Tekrar sayısı 4'te kalır.</p></div>`;
 /* ---------- SEANS ---------- */
 function viewSeans(){
   if(DB.active)return viewLog();
@@ -790,41 +883,36 @@ function viewSeans(){
   if(S[session]&&!gk.includes(session))gk=gk.concat([session]);
   const allT=['U3','U2','L3','L2','FA','FB'].filter(k=>!gk.includes(k));
   const tabs=`<div class="sel">${gk.map(k=>`<button class="${k===session?'on':''}" onclick="session='${k}';render(true)">${S[k].name}</button>`).join('')}<button class="${session==='VO2'?'on':''}" onclick="session='VO2';render(true)">VO2</button><button class="${session==='RUN'?'on':''}" onclick="session='RUN';render(true)">Koşu</button></div>
-  <details><summary>Diğer şablonlar</summary><div class="sel">${allT.map(k=>`<button onclick="session='${k}';render(true)">${S[k].name} <small>(${{U3:'3 gym',U2:'3 gym',L3:'3 gym',L2:'kardiyo yerine',FA:'2 gym',FB:'2 gym'}[k]})</small></button>`).join('')}</div></details>`;
+  <details><summary>Diğer şablonlar</summary><div class="sel">${allT.map(k=>`<button onclick="session='${k}';render(true)">${S[k].name} <small>(${{U3:'3 gym',U2:'3 gym',L3:'3 gym',L2:'koşu yerine',FA:'2 gym',FB:'2 gym'}[k]})</small></button>`).join('')}</div></details>`;
   const startBtn=`<button class="big pri" onclick="startS('${session}')">Bu seansı başlat</button>`;
   if(session==='VO2'){
     return `<h1>VO2 seansı</h1>${tabs}
-    <div class="card"><b>Hafta ${week}: ${ph.vo2Off?'yok':ph.bike?'spin bike':'koşu'}</b>
-    ${ph.vo2Off?'<p class="ink">Adaptasyon haftası, VO2 yok. Yerine kolay koşu veya dinlenme.</p>':`
-    <p class="ink">Isınma 7 dk hafif, son dakikada 2 kısa hızlanma.</p>
-    <p class="ink">Ana bölüm: ${ph.vo2}.</p>
-    ${ph.tabataOk?`<p class="ink">${TABATA}</p>`:''}
-    <p class="ink">Soğuma 7 dk.</p>
-    <p>Sert blok: ilk 60 sn kendini frenle, sona doğru sadece kelime çıkarabil. Aralar çok hafif, nabız 120-130'a insin. Son blok ilk blokla aynı hızda olmalı; öyleyse sonraki hafta bir tık hızlan.</p>
-    <p class="hint">Nabız 155-162 ile başla, birkaç seans sonra 165-170 görmek normal. Tek haftalar bike, çift haftalar koşu.</p>`}</div>${startBtn}`;
+    ${ph.travel?`<div class="card"><b>Seyahat haftası</b><p class="ink">${IPVO2}</p></div>`:ph.light?`<div class="card"><b>Hafif hafta</b><p class="ink">Bike 10 dk ısınma, 3 x (3 dk orta sert / 3 dk hafif), 5 dk soğuma. Nefes nefese kalma.</p></div>`:VO2_HTML}${startBtn}`;
   }
   if(session==='RUN'){
-    return `<h1>Koşu seansı</h1>${tabs}
-    <div class="card"><b>Hafta ${week}</b>
-    <p class="ink">5 dk yürüyüş, sonra: ${ph.run}. Bitirince 5 dk yürüyüş.</p>
-    <p class="ink">Kolay koşularda nabız tavanı 150. İlk kilometreyi bilerek yavaş aç.</p>
-    <p class="hint">Hat: 10/1 → devamlı 25 dk (Kasım) → 5K durmadan (Aralık) → 50 dk (Şubat) → 60-70 dk (Nisan) → 10K (30 Nisan). Nefes rahat değilse süreyi artırma, bir hafta aynı kal.</p></div>${startBtn}`;
+    return `<h1>Koşu</h1>${tabs}
+    <div class="card"><b>Koşuları Runna yönetiyor</b>
+    <p class="ink">Haftada 2 koşu. Antrenmanı Runna'dan yap, bitince burada başlatıp süre, mesafe ve ortalama nabzı gir. Böylece hafta sayımı tam kalır.</p>
+    <ul><li>Haftada tek sert koşu (interval, tempo). Diğeri kolay ya da uzun.</li>
+    <li>Lower A ve Full Body'nin ertesi günü sert koşu yok.</li>
+    <li>Sert koşuda nabız için Apple Watch'a bak. WHOOP hızlı tekrarlarda adım ritmini nabız sanabiliyor.</li>
+    <li>Koşu yapamadığın gün: bike VO2 ya da Lower B.</li></ul>
+    <p class="hint">Hedef: 30 Nisan'da durmadan 10 km.</p></div>${startBtn}`;
   }
   const {rows,total}=exerciseRows(session);
   const lower=LOWERISH.includes(session);
   return `<h1>${S[session].name}</h1><p>${S[session].sub}</p>${tabs}
   ${startBtn}
-  <details><summary>Isınma, 7 dk</summary><ul class="warm">${WARM.concat(lower?WARM_LOWER:[]).map(x=>`<li>${x}</li>`).join('')}</ul></details>
+  <details><summary>Isınma, 7 dk</summary><ul class="warm">${(lower?WARM_LOWER:WARM).map(x=>`<li>${x}</li>`).join('')}</ul></details>
   <div class="card">${rows}<div class="sum"><span>Net iş</span><b>~${Math.round(total)} dk</b></div><div class="sum" style="border:0;padding-top:4px"><span>Isınma + soğuma dahil</span><b>~${Math.round(total)+14} dk</b></div></div>
   <details><summary>Soğuma, 7 dk</summary><ul class="warm">${COOL.map(x=>`<li>${x}</li>`).join('')}</ul></details>
-  ${!ph.light?`<p class="hint">${EMOM}</p>`:''}
   <p class="hint">Bu ekran seansın önizlemesi. Kilo girmek için "Bu seansı başlat".</p>`;
 }
 
 /* ---------- GEÇMİŞ ---------- */
 function viewGecmis(){
   const l=sorted();
-  const exNames=[];['U3','U2','L3','L2','FA','FB','UA','UB','LA','LB','F3'].forEach(k=>S[k].rows.forEach(r=>{const m=movesOf(r);if(m)m.forEach(x=>{if(x.log!=='none'&&!exNames.includes(x.name))exNames.push(x.name);});}));
+  const exNames=[];['U3','U2','L3','L2','FA','FB','UA','UB','LA','LB','F3'].map(k=>S[k]).concat(Object.values(TPL_V2),Object.values(OLD_TPL)).forEach(T=>T.rows.forEach(r=>{const m=movesOf(r);if(m)m.forEach(x=>{if(x.log!=='none'&&!exNames.includes(x.name))exNames.push(x.name);});}));
   const exHtml=exNames.map(n=>{
     const hist=l.filter(s=>s.ex&&s.ex[n]&&s.ex[n].s.length).slice(-5);
     if(!hist.length)return '';
@@ -860,7 +948,7 @@ const TESTS=[
  ['H12','H13, 21-27 Ara','Max şınav, bantsız barfiks denemesi, 5K durmadan','22 şınav, barfiks çok yakın, 5K yürümeden'],
  ['H16','H17, 18-24 Oca','Max şınav, barfiks, 5K zaman, WHOOP VO2 max','24 şınav, 1 barfiks, 5K 34-35 dk, VO2 45'],
  ['H26','H25-27, 15 Mar - 4 Nis','Şınav otelde (H25), barfiks ve 5K zaman 27. hafta başı','27 şınav, 2-3 barfiks, 5K 31-32 dk, VO2 46-47'],
- ['H31','H31, 26-30 Nis','10K durmadan, şınav, barfiks, 5 tekrar max (squat, bench, RDL)','10K yürümeden, 30 şınav, 4-5 barfiks, VO2 47-48']
+ ['H31','H31, 26-30 Nis','10K durmadan, şınav, barfiks, 5 tekrar max (leg press, bench)','10K yürümeden, 30 şınav, 4-5 barfiks, VO2 47-48']
 ];
 const TF=[['sinav','Şınav'],['barfiks','Barfiks'],['kosu','Koşu süresi'],['vo2','VO2 max'],['kilo','Kilo'],['bel','Bel cm']];
 function tset(k,f,v){DB.tests[k]=DB.tests[k]||{};DB.tests[k][f]=v;pend().meta=true;save();syncLater(2000);}
